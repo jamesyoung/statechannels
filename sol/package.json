@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "ganache": "ganache-cli --gasLimit 0xfffffffffff --port 9545 --account=\"${npm_package_config_unlockedAccount}\" -m \"${npm_package_config_mnemonic}\"",
+    "ganache": "ganache-cli --gasLimit 0xfffffffffff --port 8545 --account=\"${npm_package_config_unlockedAccount}\" -m \"${npm_package_config_mnemonic}\"",
     "lint:fix": "npm run lint:sol:fix",
     "lint": "npm run lint:sol",
     "lint:sol:fix": "solium -d sol/contracts --fix",
