@@ -1,0 +1,45 @@
+{
+  "name": "schub",
+  "version": "1.0.0",
+  "description": "State channel hub",
+  "main": "index.js",
+  "dependencies": {
+    "ethers": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "ganache-cli": "^6.1.8",
+    "mocha": "^5.2.0",
+    "solc": "^0.4.25",
+    "solium": "^1.1.8",
+    "truffle": "^4.1.14"
+  },
+  "scripts": {
+    "test": "mocha",
+    "ganache": "ganache-cli --gasLimit 0xfffffffffff --port 9545 --account=\"${npm_package_config_unlockedAccount}\" -m \"${npm_package_config_mnemonic}\"",
+    "lint:fix": "npm run lint:sol:fix",
+    "lint": "npm run lint:sol",
+    "lint:sol:fix": "solium -d sol/contracts --fix",
+    "lint:sol": "solium -d sol/contracts",
+    "truffle:compile": "truffle compile --all",
+    "truffle:console": "truffle console",
+    "truffle:migrate": "truffle migrate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LunchBadger/statechannels.git"
+  },
+  "keywords": [
+    "state channels"
+  ],
+  "config": {
+    "unlockedAccount": "0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d,1000000000000000000000000",
+    "mnemonic": "concert load couple harbor equip island argue ramp clarify fence smart topic"
+  },
+  "author": "James, Albert, Raymond",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LunchBadger/statechannels/issues"
+  },
+  "homepage": "https://github.com/LunchBadger/statechannels#readme"
+}
