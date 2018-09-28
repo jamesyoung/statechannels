@@ -19,7 +19,7 @@ library SafeMath {
         }
 
         uint256 c = a * b;
-        require(c / a == b);
+        require(c / a == b, "product/multiplicand must be equal to multiplier");
 
         return c;
     }
@@ -28,7 +28,7 @@ library SafeMath {
     * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
     */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b > 0); // Solidity only automatically asserts when dividing by 0
+        require(b > 0, "divisor must >0"); // Solidity only automatically asserts when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
@@ -39,7 +39,7 @@ library SafeMath {
     * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b <= a);
+        require(b <= a, "subtrahend must be equal greater than minuend");
         uint256 c = a - b;
 
         return c;
@@ -50,7 +50,7 @@ library SafeMath {
     */
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
-        require(c >= a);
+        require(c >= a && c >= b, "sum must be equal or greater than both augend and addend");
 
         return c;
     }
@@ -60,7 +60,7 @@ library SafeMath {
     * reverts when dividing by zero.
     */
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b != 0);
+        require(b != 0, "cannot divide by 0");
         return a % b;
     }
 }
