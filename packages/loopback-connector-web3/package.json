@@ -1,6 +1,6 @@
 {
   "name": "loopback-connector-web3",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "web3 connector for loopback",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,8 @@
   "author": "James Young <james.s.young@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "debug": "^2.6.0",
-    "solc": "^0.4.8",
-    "web3": "^0.18.2"
+    "debug": "^4.0.1",
+    "solc": "^0.4.25",
+    "web3": "^0.20.7"
   }
 }
