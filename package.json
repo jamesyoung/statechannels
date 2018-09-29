@@ -1,0 +1,22 @@
+{
+  "name": "state-channels-poc",
+  "version": "1.0.0",
+  "description": "PoC for state channels",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "lerna bootstrap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LunchBadger/statechannels.git"
+  },
+  "author": "James, Albert, Raymond",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LunchBadger/statechannels/issues"
+  },
+  "homepage": "https://github.com/LunchBadger/statechannels#readme",
+  "devDependencies": {
+    "lerna": "^3.4.0"
+  }
+}

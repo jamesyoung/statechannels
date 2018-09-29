@@ -1,0 +1,30 @@
+{
+  "lerna": "3.4.0",
+  "packages": [
+    "packages/*"
+  ],
+  "command": {
+    "bootstrap": {
+      "concurrency": 8,
+      "ci": false
+    },
+    "version": {
+      "message": "chore: publish release"
+    },
+    "publish": {
+    },
+    "run": {
+      "prefix": false,
+      "loglevel": "silent",
+      "stream": true,
+      "concurrency": 8,
+      "sort": true
+    },
+    "clean": {
+      "loglevel": "silent",
+      "concurrency": 8,
+      "yes": true
+    }
+  },
+  "version": "independent"
+}
