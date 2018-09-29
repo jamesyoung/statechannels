@@ -9,20 +9,20 @@ describe('Contract model builder', () => {
       {
         name: 'deposit',
         accepts: [
-          {arg: '_timeout', type: 'uint256'},
-          {arg: '_payee', type: 'address'},
+          {arg: '_timeout', type: 'number', solidityType: 'uint256'},
+          {arg: '_payee', type: 'string', solidityType: 'address'},
         ],
         returns: [],
       },
       {
         name: 'withdraw',
         accepts: [
-          {arg: 'h', type: 'bytes32'},
-          {arg: 'v', type: 'uint8'},
-          {arg: 'r', type: 'bytes32'},
-          {arg: 's', type: 'bytes32'},
-          {arg: 'value', type: 'uint256'},
-          {arg: 'payer', type: 'address'},
+          {arg: 'h', type: 'string', solidityType: 'bytes32'},
+          {arg: 'v', type: 'number', solidityType: 'uint8'},
+          {arg: 'r', type: 'string', solidityType: 'bytes32'},
+          {arg: 's', type: 'string', solidityType: 'bytes32'},
+          {arg: 'value', type: 'number', solidityType: 'uint256'},
+          {arg: 'payer', type: 'string', solidityType: 'address'},
         ],
         returns: [],
       },

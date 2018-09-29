@@ -9,11 +9,13 @@
   "author": "James Young <james.s.young@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "bignumber": "^1.1.0",
     "debug": "^4.0.1",
     "solc": "^0.4.25",
     "web3": "^0.20.7"
   },
   "devDependencies": {
+    "@types/web3": "^1.0.6",
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
   }
