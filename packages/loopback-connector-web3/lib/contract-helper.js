@@ -29,7 +29,7 @@ function contractConstructorFactory(
       function(e, contractInstance) {
         if (e !== null) {
           debug('Failed to create contract', e);
-          cb && cb(null, {error: e.toString()});
+          cb && cb(e);
         } else {
           if (contractInstance.address != null) {
             debug(
