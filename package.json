@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "PoC for state channels",
   "engines": {
-    "node": ">=8.9"
+    "node": ">=10"
   },
   "scripts": {
     "postinstall": "lerna bootstrap",
