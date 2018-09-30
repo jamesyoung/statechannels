@@ -1,7 +1,7 @@
 {
   "name": "channel-contracts",
   "version": "0.1.0",
-  "description": "State channel hub",
+  "description": "State channel contracts",
   "main": "index.js",
   "dependencies": {
     "ethers": "^4.0.0"

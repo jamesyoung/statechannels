@@ -4,7 +4,7 @@ This repository is a monorepo managed by [lerna](https://github.com/lerna/lerna)
 
 It contains the following packages:
 
-- sol: Solidity contracts for the state channel
+- channel-contracts: Solidity contracts for the state channel
 - loopback-connector-web3: Web3 Connector for LoopBack 3.x
 - sc-demo-app: A demo application
 
@@ -22,7 +22,7 @@ npm i
 
 ### Compile contracts
 ```sh
-cd packages/sol
+cd packages/channel-contracts
 npm run truffle:compile
 ```
 
@@ -35,7 +35,7 @@ npm run ganache
 
 ### Run migration
 ```sh
-cd packages/sol
+cd packages/channel-contracts
 npm run truffle:migrate
 ```
 
