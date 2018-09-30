@@ -1,11 +1,15 @@
 const AbiModelBuilder = require('../lib/abi-model-builder').AbiModelBuilder;
-const expect = require('chai').expect;
+const expect = require('should/as-function');
+expect.use((should, assertion) => {
+  assertion.addChain('to');
+});
 
 describe('Contract model builder', () => {
+  const builder = new AbiModelBuilder(givenContract());
+
   it('builds a loopback model from abi json', () => {
-    const builder = new AbiModelBuilder(givenContract());
     const methods = builder.getMethods();
-    expect(methods).to.eql([
+    expect(methods).to.containDeep([
       {
         name: 'deposit',
         accepts: [
@@ -27,6 +31,28 @@ describe('Contract model builder', () => {
         returns: [],
       },
     ]);
+  });
+
+  it('builds a constructor from abi json', () => {
+    const ctor = builder.getConstructor();
+    expect(ctor).to.containDeep({
+      functionSpec: {
+        inputs: [
+          { name: '_hub', type: 'address' },
+          { name: '_percentageFee', type: 'uint256' }
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'constructor'
+      },
+      name: 'constructor',
+      description: 'Create an instance of Channel',
+      accepts: [
+        { arg: '_hub', type: 'string', solidityType: 'address' },
+        { arg: '_percentageFee', type: 'number', solidityType: 'uint256' }
+      ],
+      returns: [ { arg: 'contractAddress', type: 'string' } ]
+    });
   });
 });
 

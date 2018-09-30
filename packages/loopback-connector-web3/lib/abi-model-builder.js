@@ -66,11 +66,11 @@ const TYPE_MAPPING = getTypeMapping();
 
 /**
  * Map a solidity type to JSON type
- * @param {*} solidityType 
+ * @param {*} solidityType
  */
 function getType(solidityType) {
-  const [name, type] = Object.entries(WEB3_TYPES).find(
-    ([name, type]) => type.isType(solidityType),
+  const [name, type] = Object.entries(WEB3_TYPES).find(([name, type]) =>
+    type.isType(solidityType),
   );
   return TYPE_MAPPING[name || solidityType] || solidityType;
 }
@@ -92,137 +92,47 @@ class AbiModelBuilder {
       if (f.inputs && f.inputs[0] && f.inputs[0].name === '') return false;
       return true;
     });
-    return functions.map(f => {
-      return {
-        name: f.name,
-        accepts: f.inputs.map(arg => ({
-          arg: arg.name,
-          type: getType(arg.type),
-          solidityType: arg.type,
-        })),
-        returns: f.outputs.map(arg => ({
-          arg: arg.name,
-          type: getType(arg.type),
-          solidityType: arg.type,
-        })),
-      };
-    });
+    return functions.map(f => this.getMethod(f));
+  }
+
+  getMethod(functionSpec, description) {
+    const inputs = functionSpec.inputs || [];
+    const outputs = functionSpec.outputs || [];
+    return {
+      functionSpec,
+      name: functionSpec.name || 'constructor',
+      description:
+        description ||
+        `Invoke ${this.contractSpec.contractName}.${functionSpec.name}`,
+      accepts: inputs.map(arg => ({
+        arg: arg.name,
+        type: getType(arg.type),
+        solidityType: arg.type,
+        http: {source: 'form'},
+      })),
+      returns: outputs.map(arg => ({
+        arg: arg.name,
+        type: getType(arg.type),
+        solidityType: arg.type,
+        http: {source: 'form'},
+      })),
+    };
   }
 
   /**
    * Get the constructor
-   *
-   * @param {object} contractSpec
    */
   getConstructor() {
-    return this.contractSpec.abi.find(f => f.type === 'constructor');
+    const ctor = this.contractSpec.abi.find(f => f.type === 'constructor');
+    if (ctor) {
+      const create = this.getMethod(
+        ctor,
+        `Create an instance of ${this.contractSpec.contractName}`,
+      );
+      create.returns = [{arg: 'contractAddress', type: 'string', root: true}];
+      return create;
+    } else return undefined;
   }
 }
 
 exports.AbiModelBuilder = AbiModelBuilder;
-
-/*
-{
-  "contractName": "Channel",
-  "abi": [
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "payers",
-      "outputs": [
-        {
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "name": "timeout",
-          "type": "uint256"
-        },
-        {
-          "name": "complete",
-          "type": "bool"
-        },
-        {
-          "name": "payee",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "name": "_hub",
-          "type": "address"
-        },
-        {
-          "name": "_percentageFee",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_timeout",
-          "type": "uint256"
-        },
-        {
-          "name": "_payee",
-          "type": "address"
-        }
-      ],
-      "name": "deposit",
-      "outputs": [],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "h",
-          "type": "bytes32"
-        },
-        {
-          "name": "v",
-          "type": "uint8"
-        },
-        {
-          "name": "r",
-          "type": "bytes32"
-        },
-        {
-          "name": "s",
-          "type": "bytes32"
-        },
-        {
-          "name": "value",
-          "type": "uint256"
-        },
-        {
-          "name": "payer",
-          "type": "address"
-        }
-      ],
-      "name": "withdraw",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ],
-}
-*/

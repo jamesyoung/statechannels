@@ -1,14 +1,17 @@
 'use strict';
 
-const debug = require('debug')('loopback:connector:web3');
 const Web3 = require('web3');
 const Web3DAO = require('./dao');
 const {loadContract} = require('./solidity-helper');
-
-const contracts = {};
+const {
+  contractConstructorFactory,
+  contractFunctionFactory,
+} = require('./contract-helper');
+const {AbiModelBuilder} = require('./abi-model-builder');
 
 class Web3Connector {
   constructor(settings) {
+    this.contracts = {};
     this.name = settings.name || 'web3';
     this.settings = settings;
 
@@ -38,101 +41,60 @@ class Web3Connector {
     const etherumConfig = modelData.settings.ethereum || {};
 
     const contractSettings = etherumConfig.contract;
-    const {abi, bytecode} = contractSettings;
+    const {abi, bytecode, contractName} = contractSettings;
     if (!abi) {
       etherumConfig.compliedContract = loadContract(
         contractSettings.sol,
-        contractSettings.name,
+        contractName,
       );
       abi = etherumConfig.compliedContract.abi;
       bytecode = etherumConfig.compliedContract.bytecode;
     }
-    const Contract = web3.eth.contract(abi);
+    const contractClass = web3.eth.contract(abi);
     const gas = etherumConfig.gas;
 
-    if (contractSettings.params !== undefined) {
-      contractSettings.params.map(param => {
-        switch (param.type) {
-          case 'string':
-            model.defineProperty('params', {type: String, id: false});
-            break;
-          case 'integer':
-            model.defineProperty('params', {type: Number, id: false});
-            break;
-          case 'boolean':
-            model.defineProperty('params', {type: Boolean, id: false});
-            break;
-        }
-      });
-    }
+    this.abiContractBuilder = new AbiModelBuilder({
+      contractName,
+      abi,
+      bytecode,
+    });
 
-    model.construct = function(data, cb) {
-      const params = data['params'] || null;
-      Contract.new(
-        params,
-        {
-          from: web3.eth.defaultAccount,
-          data: bytecode.toString(),
-          gas: gas,
-        },
-        function(e, contractInstance) {
-          if (e !== null) {
-            cb && cb(null, {error: e.toString()});
-          } else {
-            if (contractInstance.address === undefined) {
-              debug(
-                'Contract mined! address: ' +
-                  contractInstance.address +
-                  ' transactionHash: ' +
-                  contractInstance.transactionHash,
-              );
-              contracts[contractInstance.address] = contractInstance;
-              cb && cb(null, {id: contractInstance.address});
-            }
-          }
-        },
-      );
-    };
+    const ctor = this.abiContractBuilder.getConstructor();
+
+    model.create = contractConstructorFactory(
+      this.web3.eth.defaultAccount,
+      this.contracts,
+      contractClass,
+      bytecode,
+      gas,
+    );
+
+    setRemoting(
+      model.create,
+      Object.assign(ctor, {
+        http: {verb: 'post', path: '/'},
+      }),
+    );
 
     this.defineMethods(model, abi);
-
-    setRemoting(model.construct, {
-      description: 'Create a new contract instance',
-      accepts: {arg: 'data', type: 'object', http: {source: 'body'}},
-      returns: {arg: 'results', type: 'object', root: true},
-      http: {verb: 'post', path: '/'},
-    });
   }
 
-  defineMethods(model, abi) {
-    const web3 = this.web3;
+  defineMethods(model) {
+    const methods = this.abiContractBuilder.getMethods();
 
-    abi.map(function(obj) {
-      if (obj.constant === false && obj.type === 'function') {
-        model.prototype[obj.name] = function(data, cb) {
-          const address = this.id.toString(16);
-          const params = obj.inputs.map(function(input) {
-            return data[input.name];
-          });
-          const contractInstance = contracts[address];
-          const method = contractInstance[obj.name];
-          const args = [
-            ...params,
-            function(err, result) {
-              cb &&
-                cb(null, {account: web3.eth.defaultAccount, txhash: result});
-            },
-          ];
-          const result = method.apply(contractInstance, args);
-        };
-        model.remoteMethod(obj.name, {
-          description: 'Call the ' + obj.name + ' contract method',
-          accepts: {arg: 'data', type: Number, http: {source: 'body'}},
-          returns: {args: 'results', type: 'object', root: true},
-          http: {verb: 'post', path: '/' + obj.name},
+    methods.map(method => {
+      model.prototype[method.name] = contractFunctionFactory(
+        this.web3.eth.defaultAccount,
+        this.contracts,
+        method.functionSpec,
+      );
+      model.remoteMethod(
+        method.name,
+        Object.assign(method, {
+          http: {verb: 'post', path: '/' + method.name},
           isStatic: false,
-        });
-      }
+        }),
+      );
     });
   }
 }
@@ -140,7 +102,7 @@ class Web3Connector {
 function setRemoting(fn, options) {
   options = options || {};
   for (const opt in options) {
-    if (options.hasOwnProperty(opt)) {
+    if (opt !== 'name' && options.hasOwnProperty(opt)) {
       fn[opt] = options[opt];
     }
   }
