@@ -1,143 +1,145 @@
 'use strict';
 
-var debug = require('debug')('loopback:connector:web3');
-var Web3 = require('web3');
-var solc = require('solc');
-var fs = require('fs');
-var Web3DAO = require('./dao');
+const debug = require('debug')('loopback:connector:web3');
+const Web3 = require('web3');
+const Web3DAO = require('./dao');
+const {loadContract} = require('./solidity-helper');
 
-var contracts = {};
+const contracts = {};
 
-function Web3Connector(settings) {
-  this.name = settings.name;
-  this.settings = settings;
+class Web3Connector {
+  constructor(settings) {
+    this.name = settings.name || 'web3';
+    this.settings = settings;
 
-  const url = settings.url || 'http://localhost:8545';
-  this.web3 = new Web3(new Web3.providers.HttpProvider(url));
-}
+    const url = settings.url || 'http://localhost:8545';
+    this.web3 = new Web3(new Web3.providers.HttpProvider(url));
+    this.DataAccessObject = Web3DAO;
+  }
 
-Web3Connector.prototype.DataAccessObject = Web3DAO;
+  connect(cb) {
+    this.web3.eth.getAccounts((err, accounts) => {
+      if (err) {
+        return cb(err);
+      }
 
-Web3Connector.prototype.connect = function(cb) {
-  const web3 = this.web3;
+      this.web3.eth.defaultAccount = accounts[0];
+      cb();
+    });
+  }
 
-  web3.eth.getAccounts(function(err, accounts) {
-    if (err) {
-      return cb(err);
+  define(modelData) {
+    const web3 = this.web3;
+    const model = modelData.model;
+
+    // all models must have an ID property, and we want this model to have a String ID property
+    model.defineProperty('id', {type: String, id: true});
+
+    const etherumConfig = modelData.settings.ethereum || {};
+
+    const contractSettings = etherumConfig.contract;
+    const {abi, bytecode} = contractSettings;
+    if (!abi) {
+      etherumConfig.compliedContract = loadContract(
+        contractSettings.sol,
+        contractSettings.name,
+      );
+      abi = etherumConfig.compliedContract.abi;
+      bytecode = etherumConfig.compliedContract.bytecode;
+    }
+    const Contract = web3.eth.contract(abi);
+    const gas = etherumConfig.gas;
+
+    if (contractSettings.params !== undefined) {
+      contractSettings.params.map(param => {
+        switch (param.type) {
+          case 'string':
+            model.defineProperty('params', {type: String, id: false});
+            break;
+          case 'integer':
+            model.defineProperty('params', {type: Number, id: false});
+            break;
+          case 'boolean':
+            model.defineProperty('params', {type: Boolean, id: false});
+            break;
+        }
+      });
     }
 
-    web3.eth.defaultAccount = accounts[0];
-    cb();
-  });
-}
+    model.construct = function(data, cb) {
+      const params = data['params'] || null;
+      Contract.new(
+        params,
+        {
+          from: web3.eth.defaultAccount,
+          data: bytecode.toString(),
+          gas: gas,
+        },
+        function(e, contractInstance) {
+          if (e !== null) {
+            cb && cb(null, {error: e.toString()});
+          } else {
+            if (contractInstance.address === undefined) {
+              debug(
+                'Contract mined! address: ' +
+                  contractInstance.address +
+                  ' transactionHash: ' +
+                  contractInstance.transactionHash,
+              );
+              contracts[contractInstance.address] = contractInstance;
+              cb && cb(null, {id: contractInstance.address});
+            }
+          }
+        },
+      );
+    };
 
-Web3Connector.prototype.define = function(modelData) {
-  var web3 = this.web3;
-  var model = modelData.model;
+    this.defineMethods(model, abi);
 
-  // all models must have an ID property, and we want this model to have a String ID property
-  model.defineProperty('id', {type: String, id: true});
+    setRemoting(model.construct, {
+      description: 'Create a new contract instance',
+      accepts: {arg: 'data', type: 'object', http: {source: 'body'}},
+      returns: {arg: 'results', type: 'object', root: true},
+      http: {verb: 'post', path: '/'},
+    });
+  }
 
-  var contractSettings = modelData.settings.ethereum.contract;
-  var contractStr = getSolSourceFile(modelData.settings.ethereum.contract.sol);
-  var compiledContract = compileSolSourceFile(contractStr);
-  var abi = getAbi(compiledContract, contractSettings.name);
-  var bytecode = getBytecode(compiledContract, contractSettings.name);
-  var Contract = web3.eth.contract(abi);
-  var gas = modelData.settings.ethereum.gas;
+  defineMethods(model, abi) {
+    const web3 = this.web3;
 
-  if (contractSettings.params !== undefined) {
-    contractSettings.params.map(function (param){
-      switch (param.type) {
-        case "string":
-          model.defineProperty("params", {type: String, id: false});
-          break;
-        case "integer":
-          model.defineProperty("params", {type: Number, id: false});
-          break;
-        case "boolean":
-          model.defineProperty("params", {type: Boolean, id: false});
-          break;
+    abi.map(function(obj) {
+      if (obj.constant === false && obj.type === 'function') {
+        model.prototype[obj.name] = function(data, cb) {
+          const address = this.id.toString(16);
+          const params = obj.inputs.map(function(input) {
+            return data[input.name];
+          });
+          const contractInstance = contracts[address];
+          const method = contractInstance[obj.name];
+          const args = [
+            ...params,
+            function(err, result) {
+              cb &&
+                cb(null, {account: web3.eth.defaultAccount, txhash: result});
+            },
+          ];
+          const result = method.apply(contractInstance, args);
+        };
+        model.remoteMethod(obj.name, {
+          description: 'Call the ' + obj.name + ' contract method',
+          accepts: {arg: 'data', type: Number, http: {source: 'body'}},
+          returns: {args: 'results', type: 'object', root: true},
+          http: {verb: 'post', path: '/' + obj.name},
+          isStatic: false,
+        });
       }
     });
   }
-  
-  model.construct = function(data, cb) {
-    var params = data['params'] || null;
-    var contract = Contract.new(params, {
-      from: web3.eth.defaultAccount,
-      data: bytecode.toString(),
-      gas: gas
-      }, function (e, contractInstance){
-        if (e !== null) {
-          cb && cb(null, {error:e.toString()})
-        } else {
-          if (typeof contractInstance.address !== 'undefined') {
-            debug('Contract mined! address: ' + contractInstance.address + ' transactionHash: ' + contractInstance.transactionHash);
-            contracts[contractInstance.address] = contractInstance;
-            cb && cb(null, {id:contractInstance.address})
-          }
-        }
-    })
-  }
-
-  this.defineMethods(model, abi);
-
-  setRemoting(model.construct, {
-    description: 'Create a new contract instance',
-    accepts: {arg: 'data', type: 'object', http: {source: 'body'}},
-    returns: {arg: 'results', type: 'object', root: true},
-    http: {verb: 'post', 'path': '/'},
-  });
-}
-
-function getSolSourceFile(fileName) {
-  return fs.readFileSync(fileName, {encoding: 'utf-8'});
-}
-
-function compileSolSourceFile(sourceStr) {
-  return solc.compile(sourceStr, 1);
-}
-
-function getAbi(compiledContract, contractName) {
-  return JSON.parse(compiledContract.contracts[contractName].interface);
-}
-
-function getBytecode(compiledContract, contractName) {
-  return compiledContract.contracts[contractName].bytecode
-}
-
-Web3Connector.prototype.defineMethods = function(model, abi) {
-  const web3 = this.web3;
-
-  abi.map(function(obj){
-    if (obj.constant === false && obj.type === "function") {
-      model.prototype[obj.name] = function(data, cb) {
-        var address = this.id.toString(16);
-        var params = obj.inputs.map(function(input) {
-          return data[input.name];
-        })
-        var contractInstance = contracts[address];
-        var method = contractInstance[obj.name];
-        var args = [...params, function(err, result) {
-          cb && cb(null, {"account": web3.eth.defaultAccount, "txhash":result})  
-        }];
-        var result = method.apply(contractInstance, args);
-      }
-      model.remoteMethod(obj.name, {
-        description: 'Call the ' + obj.name + ' contract method',
-        accepts: {arg: 'data', type: Number, http: {source: 'body'}},
-        returns : {args: 'results', type: 'object', root: true},
-        http: {verb: 'post', 'path': '/' + obj.name},
-        isStatic: false
-      })
-    }
-  })
 }
 
 function setRemoting(fn, options) {
   options = options || {};
-  for (var opt in options) {
+  for (const opt in options) {
     if (options.hasOwnProperty(opt)) {
       fn[opt] = options[opt];
     }

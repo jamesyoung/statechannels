@@ -1,6 +1,6 @@
 {
-  "name": "schub",
-  "version": "1.0.0",
+  "name": "channel-contracts",
+  "version": "0.1.0",
   "description": "State channel hub",
   "main": "index.js",
   "dependencies": {

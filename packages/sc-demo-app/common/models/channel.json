@@ -1,0 +1,17 @@
+{
+  "name": "channel",
+  "plural": "channels",
+  "base": "Model",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "ethereum": {
+      "contract": {}
+    }
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
