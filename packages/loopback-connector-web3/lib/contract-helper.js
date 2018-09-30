@@ -65,14 +65,14 @@ function contractFunctionFactory(account, contracts, functionSpec) {
       throw err;
     }
     const method = contractInstance[functionSpec.name];
-    const args = [
+    const fnArgs = [
       ...params,
       function(err, result) {
         debug('Result: %s', result);
         cb && cb(null, {account: account, txhash: result});
       },
     ];
-    method.apply(contractInstance, args);
+    method.apply(contractInstance, fnArgs);
   };
 }
 
