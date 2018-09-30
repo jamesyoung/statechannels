@@ -4,7 +4,13 @@
   "description": "PoC for state channels",
   "main": "index.js",
   "scripts": {
-    "postinstall": "lerna bootstrap"
+    "postinstall": "lerna bootstrap",
+    "build": "lerna run build",
+    "prettier:cli": "prettier \"**/*.ts\" \"**/*.js\" \"**/*.md\"",
+    "prettier:check": "npm run prettier:cli -- -l",
+    "prettier:fix": "npm run prettier:cli -- --write",
+    "lint": "npm run prettier:check",
+    "lint:fix": "npm run prettier:fix"
   },
   "repository": {
     "type": "git",
@@ -17,6 +23,7 @@
   },
   "homepage": "https://github.com/LunchBadger/statechannels#readme",
   "devDependencies": {
-    "lerna": "^3.4.0"
+    "lerna": "^3.4.0",
+    "prettier": "^1.14.3"
   }
 }

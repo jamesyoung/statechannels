@@ -15,6 +15,7 @@
     "truffle": "^4.1.14"
   },
   "scripts": {
+    "build": "npm run truffle:compile",
     "test": "mocha",
     "ganache": "ganache-cli --gasLimit 0xfffffffffff --port 8545 --account=\"${npm_package_config_unlockedAccount}\" -m \"${npm_package_config_mnemonic}\"",
     "lint:fix": "npm run lint:sol:fix",

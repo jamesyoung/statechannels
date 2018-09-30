@@ -1,6 +1,6 @@
 'use strict';
 
-function Web3DAO() {};
+function Web3DAO() {}
 
 Web3DAO.findById = function(id, arg2, arg3, cb) {
   var Model = this;

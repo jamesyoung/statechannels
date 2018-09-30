@@ -38,20 +38,20 @@ describe('Contract model builder', () => {
     expect(ctor).to.containDeep({
       functionSpec: {
         inputs: [
-          { name: '_hub', type: 'address' },
-          { name: '_percentageFee', type: 'uint256' }
+          {name: '_hub', type: 'address'},
+          {name: '_percentageFee', type: 'uint256'},
         ],
         payable: false,
         stateMutability: 'nonpayable',
-        type: 'constructor'
+        type: 'constructor',
       },
       name: 'constructor',
       description: 'Create an instance of Channel',
       accepts: [
-        { arg: '_hub', type: 'string', solidityType: 'address' },
-        { arg: '_percentageFee', type: 'number', solidityType: 'uint256' }
+        {arg: '_hub', type: 'string', solidityType: 'address'},
+        {arg: '_percentageFee', type: 'number', solidityType: 'uint256'},
       ],
-      returns: [ { arg: 'contractAddress', type: 'string' } ]
+      returns: [{arg: 'contractAddress', type: 'string'}],
     });
   });
 });

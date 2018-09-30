@@ -1,6 +1,7 @@
 # state-channels-poc
 
-This repository is a monorepo managed by [lerna](https://github.com/lerna/lerna).
+This repository is a monorepo managed by
+[lerna](https://github.com/lerna/lerna).
 
 It contains the following packages:
 
@@ -21,12 +22,14 @@ npm i
 ## Compile and migrate solidity contracts
 
 ### Compile contracts
+
 ```sh
 cd packages/channel-contracts
 npm run truffle:compile
 ```
 
 ### Start a local ganache
+
 To start a local ganache in a different terminal window/tab:
 
 ```sh
@@ -34,6 +37,7 @@ npm run ganache
 ```
 
 ### Run migration
+
 ```sh
 cd packages/channel-contracts
 npm run truffle:migrate
@@ -47,3 +51,4 @@ npm start
 ``
 
 Open http://localhost:3000/explorer and play!
+```
