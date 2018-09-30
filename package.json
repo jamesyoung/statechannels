@@ -2,7 +2,9 @@
   "name": "state-channels-poc",
   "version": "1.0.0",
   "description": "PoC for state channels",
-  "main": "index.js",
+  "engines": {
+    "node": ">=8.9"
+  },
   "scripts": {
     "postinstall": "lerna bootstrap",
     "build": "lerna run build",

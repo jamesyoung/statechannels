@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "State channel contracts",
   "main": "index.js",
+  "engines": {
+    "node": ">=8.9"
+  },
   "dependencies": {
     "ethers": "^4.0.0"
   },

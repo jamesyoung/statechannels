@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "web3 connector for loopback",
   "main": "index.js",
+  "engines": {
+    "node": ">=8.9"
+  },
   "scripts": {
     "test": "mocha test/**/*.js"
   },
