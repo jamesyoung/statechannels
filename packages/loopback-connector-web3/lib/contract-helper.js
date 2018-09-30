@@ -3,76 +3,80 @@
 const debug = require('debug')('loopback:connector:web3');
 /**
  * Factory to create a contract constructor function
- * @param {*} contracts
+ * @param {*} connector
  * @param {*} contractClass
- * @param {*} bytecode
- * @param {*} gas
+ * @param {string} from
+ * @param {number} gas
  */
-function contractConstructorFactory(
-  account,
-  contracts,
-  contractClass,
-  bytecode,
-  gas,
-) {
-  return function(...args) {
+function contractConstructorFactory(connector, contractClass, from, gas) {
+  return async function(...args) {
     const params = args.slice(0, args.length - 1);
     const cb = args[args.length - 1];
     debug('Creating contract %j', params);
-    contractClass.new(
-      params,
-      {
-        from: account,
-        data: bytecode.toString(),
-        gas: gas,
-      },
-      function(e, contractInstance) {
-        if (e !== null) {
-          debug('Failed to create contract', e);
-          cb && cb(e);
-        } else {
-          if (contractInstance.address != null) {
-            debug(
-              'Contract mined. address: ' +
-                contractInstance.address +
-                ' transactionHash: ' +
-                contractInstance.transactionHash,
-            );
-            contracts[contractInstance.address] = contractInstance;
-            cb && cb(null, contractInstance.address);
-          }
-        }
-      },
-    );
+    try {
+      const contractInstance = await contractClass
+        .deploy({
+          arguments: params,
+        })
+        .send({
+          from: from || connector.defaultAccount,
+          gas: gas || connector.defaultGas,
+        });
+
+      const opts = contractInstance.options;
+      if (opts.address != null) {
+        debug(
+          'Contract mined. address: ' +
+            opts.address +
+            ' transactionHash: ' +
+            opts.transactionHash,
+        );
+        connector.contracts[opts.address] = contractInstance;
+        return opts.address;
+      }
+    } catch (e) {
+      debug('Failed to create contract', e);
+      throw e;
+    }
   };
 }
 
 /**
  * Factory to create a contract function
- * @param {*} contracts
+ * @param {*} connector
  * @param {*} functionSpec
+ * @param {string} from
+ * @param {number} gas
  */
-function contractFunctionFactory(account, contracts, functionSpec) {
+function contractFunctionFactory(connector, functionSpec, from, gas) {
   return function(...args) {
     const params = args.slice(0, args.length - 1);
     const cb = args[args.length - 1];
     const address = this.id.toString(16);
     debug('Invoking contract method %s: %j', functionSpec.name, params);
-    const contractInstance = contracts[address];
+    const contractInstance = connector.contracts[address];
     if (contractInstance == null) {
       const err = Error(`Address ${address} not found`);
       err.statusCode = 404;
       throw err;
     }
-    const method = contractInstance[functionSpec.name];
-    const fnArgs = [
-      ...params,
-      function(err, result) {
-        debug('Result: %s', result);
-        cb && cb(null, {account: account, txhash: result});
+    const method = contractInstance.methods[functionSpec.name];
+    const invokeArgs = [
+      {
+        from: from || connector.defaultAccount,
+        gas: gas || connector.defaultGas,
+      },
+      (err, transactionHash) => {
+        if (err) debug(err);
+        else debug('Result: %s', transactionHash);
+        cb && cb(err, {account: account, transactionHash});
       },
     ];
-    method.apply(contractInstance, fnArgs);
+    if (functionSpec.constant) {
+      method(...params).call(...invokeArgs);
+    } else {
+      method(...params).send(...invokeArgs);
+    }
   };
 }
 

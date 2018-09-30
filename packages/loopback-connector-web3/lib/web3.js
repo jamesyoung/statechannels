@@ -16,7 +16,7 @@ class Web3Connector {
     this.settings = settings;
 
     const url = settings.url || 'http://localhost:8545';
-    this.web3 = new Web3(new Web3.providers.HttpProvider(url));
+    this.web3 = new Web3(url);
     this.DataAccessObject = Web3DAO;
   }
 
@@ -26,7 +26,7 @@ class Web3Connector {
         return cb(err);
       }
 
-      this.web3.eth.defaultAccount = accounts[0];
+      this.defaultAccount = accounts[0];
       cb();
     });
   }
@@ -50,8 +50,12 @@ class Web3Connector {
       abi = etherumConfig.compliedContract.abi;
       bytecode = etherumConfig.compliedContract.bytecode;
     }
-    const contractClass = web3.eth.contract(abi);
+    const contractClass = new web3.eth.Contract(abi);
+    contractClass.options.data = bytecode;
+    contractClass.options.from = this.defaultAccount;
+
     const gas = etherumConfig.gas;
+    contractClass.options.gas = gas;
 
     this.abiContractBuilder = new AbiModelBuilder({
       contractName,
@@ -62,10 +66,9 @@ class Web3Connector {
     const ctor = this.abiContractBuilder.getConstructor();
 
     model.create = contractConstructorFactory(
-      this.web3.eth.defaultAccount,
-      this.contracts,
+      this,
       contractClass,
-      bytecode,
+      this.defaultAccount,
       gas,
     );
 
@@ -76,17 +79,18 @@ class Web3Connector {
       }),
     );
 
-    this.defineMethods(model, abi);
+    this.defineMethods(model, gas);
   }
 
-  defineMethods(model) {
+  defineMethods(model, gas) {
     const methods = this.abiContractBuilder.getMethods();
 
     methods.map(method => {
       model.prototype[method.name] = contractFunctionFactory(
-        this.web3.eth.defaultAccount,
-        this.contracts,
+        this,
         method.functionSpec,
+        this.defaultAccount,
+        gas,
       );
       model.remoteMethod(
         method.name,

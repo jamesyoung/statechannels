@@ -1,31 +1,5 @@
 'use strict';
 
-const coder = require('web3/lib/solidity/coder');
-
-/**
- * Load web3 types
- */
-function getWeb3Types() {
-  const web3TypeNames = [
-    'address',
-    'bool',
-    'bytes',
-    'dynamicbytes',
-    'int',
-    'real',
-    'string',
-    'uint',
-    'ureal',
-  ];
-
-  const web3Types = {};
-  web3TypeNames.forEach(t => {
-    const typeClass = require(`web3/lib/solidity/${t}`);
-    web3Types[t] = new typeClass();
-  });
-  return web3Types;
-}
-
 /**
  * Web3 to JSON type mapping
  */
@@ -53,6 +27,7 @@ function getTypeMapping() {
     }
   }
 
+  registerTypes('bytes', 'string');
   registerTypes('int', 'number');
   registerTypes('uint', 'number');
   registerTypes('real', 'number');
@@ -61,7 +36,6 @@ function getTypeMapping() {
   return mapping;
 }
 
-const WEB3_TYPES = getWeb3Types();
 const TYPE_MAPPING = getTypeMapping();
 
 /**
@@ -69,10 +43,7 @@ const TYPE_MAPPING = getTypeMapping();
  * @param {*} solidityType
  */
 function getType(solidityType) {
-  const [name, type] = Object.entries(WEB3_TYPES).find(([name, type]) =>
-    type.isType(solidityType),
-  );
-  return TYPE_MAPPING[name || solidityType] || solidityType;
+  return TYPE_MAPPING[solidityType] || solidityType;
 }
 
 /**
