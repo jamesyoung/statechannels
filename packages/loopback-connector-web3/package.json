@@ -12,7 +12,7 @@
   "author": "James Young <james.s.young@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bignumber": "^1.1.0",
+    "bn.js": "^4.11.8",
     "debug": "^4.0.1",
     "solc": "^0.4.25",
     "web3": "^1.0.0-beta.36"

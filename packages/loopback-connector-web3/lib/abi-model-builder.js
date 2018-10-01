@@ -1,5 +1,7 @@
 'use strict';
 
+require('./big-number');
+
 /**
  * Web3 to JSON type mapping
  */
@@ -9,20 +11,22 @@ function getTypeMapping() {
     bool: 'boolean',
     bytes: 'string',
     dynamicbytes: 'string',
-
-    int: 'number',
-
-    real: 'number',
-
     string: 'string',
 
+    int: 'number',
+    real: 'number',
     uint: 'number',
-
     ureal: 'number',
   };
 
   function registerTypes(base, type) {
     for (let i = 8; i <= 256; i += 8) {
+      /** TODO: mapping to string/bignumber */
+      /*
+      if (type === 'number' && i >= 53) {
+        type = 'string';
+      }
+      */
       mapping[`${base}${i}`] = type;
     }
   }
