@@ -199,8 +199,6 @@ __step 1__
 
 james desposits 5 eth directly to smart contract
 
-this triggers hub to collateralize channel with 5 eth
-
 james invokes `POST /clicks/james` API
 
 hub receives the request with signed message from james
