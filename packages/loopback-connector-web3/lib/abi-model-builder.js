@@ -89,7 +89,7 @@ class AbiModelBuilder {
         arg: arg.name || 'data',
         type: getType(arg.type),
         solidityType: arg.type,
-        http: {root: true},
+        root: true,
       })),
     };
   }

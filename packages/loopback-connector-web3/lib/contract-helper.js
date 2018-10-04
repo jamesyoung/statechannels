@@ -75,17 +75,25 @@ function contractFunctionFactory(
       );
     }
     const method = contractInstance.methods[functionSpec.name];
-    const invokeArgs = [
-      options,
-      (err, transactionHash) => {
-        if (err) debug(err);
-        else debug('Result: %s', transactionHash);
-        cb && cb(err, {account: options.from, transactionHash});
-      },
-    ];
     if (functionSpec.constant) {
+      const invokeArgs = [
+        options,
+        (err, result) => {
+          if (err) debug(err);
+          else debug('Result: %s', result);
+          cb && cb(err, {data: result});
+        },
+      ];
       method(...params).call(...invokeArgs);
     } else {
+      const invokeArgs = [
+        options,
+        (err, transactionHash) => {
+          if (err) debug(err);
+          else debug('Transaction hash: %s', transactionHash);
+          cb && cb(err, {account: options.from, transactionHash});
+        },
+      ];
       method(...params).send(...invokeArgs);
     }
   };

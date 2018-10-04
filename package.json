@@ -14,7 +14,9 @@
     "lint": "npm run prettier:check",
     "lint:fix": "npm run prettier:fix",
     "prestart": "npm run build",
-    "start": "lerna run start"
+    "start": "lerna run start",
+    "ganache": "lerna run ganache",
+    "migrate": "lerna run truffle:migrate"
   },
   "repository": {
     "type": "git",
