@@ -12,7 +12,9 @@
     "prettier:check": "npm run prettier:cli -- -l",
     "prettier:fix": "npm run prettier:cli -- --write",
     "lint": "npm run prettier:check",
-    "lint:fix": "npm run prettier:fix"
+    "lint:fix": "npm run prettier:fix",
+    "prestart": "npm run build",
+    "start": "lerna run start"
   },
   "repository": {
     "type": "git",

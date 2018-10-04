@@ -86,10 +86,10 @@ class AbiModelBuilder {
         http: {source: 'form'},
       })),
       returns: outputs.map(arg => ({
-        arg: arg.name,
+        arg: arg.name || 'data',
         type: getType(arg.type),
         solidityType: arg.type,
-        http: {source: 'form'},
+        http: {root: true},
       })),
     };
   }

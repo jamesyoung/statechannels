@@ -14,25 +14,26 @@ function contractConstructorFactory(connector, contractClass, from, gas) {
     const cb = args[args.length - 1];
     debug('Creating contract %j', params);
     try {
+      const options = {
+        from: from || contractClass.options.from || connector.defaultAccount,
+        gas: gas || contractClass.options.gas || connector.defaultGas,
+      };
       const contractInstance = await contractClass
         .deploy({
           arguments: params,
         })
-        .send({
-          from: from || connector.defaultAccount,
-          gas: gas || connector.defaultGas,
-        });
+        .send(options);
 
-      const opts = contractInstance.options;
-      if (opts.address != null) {
+      const resolvedOptions = contractInstance.options;
+      if (resolvedOptions.address != null) {
         debug(
           'Contract mined. address: ' +
-            opts.address +
+            resolvedOptions.address +
             ' transactionHash: ' +
-            opts.transactionHash,
+            resolvedOptions.transactionHash,
         );
-        connector.contracts[opts.address] = contractInstance;
-        return opts.address;
+        connector.contracts[resolvedOptions.address] = contractInstance;
+        return resolvedOptions.address;
       }
     } catch (e) {
       debug('Failed to create contract', e);
@@ -44,32 +45,42 @@ function contractConstructorFactory(connector, contractClass, from, gas) {
 /**
  * Factory to create a contract function
  * @param {*} connector
+ * @param {*} contractClass
  * @param {*} functionSpec
  * @param {string} from
  * @param {number} gas
  */
-function contractFunctionFactory(connector, functionSpec, from, gas) {
+function contractFunctionFactory(
+  connector,
+  contractClass,
+  functionSpec,
+  from,
+  gas,
+) {
   return function(...args) {
+    const options = {
+      from: from || contractClass.options.from || connector.defaultAccount,
+      gas: gas || contractClass.options.gas || connector.defaultGas,
+    };
     const params = args.slice(0, args.length - 1);
     const cb = args[args.length - 1];
     const address = this.id.toString(16);
     debug('Invoking contract method %s: %j', functionSpec.name, params);
-    const contractInstance = connector.contracts[address];
+    let contractInstance = connector.contracts[address];
     if (contractInstance == null) {
-      const err = Error(`Address ${address} not found`);
-      err.statusCode = 404;
-      throw err;
+      contractInstance = new connector.web3.eth.Contract(
+        contractClass.options.abi,
+        address,
+        options,
+      );
     }
     const method = contractInstance.methods[functionSpec.name];
     const invokeArgs = [
-      {
-        from: from || connector.defaultAccount,
-        gas: gas || connector.defaultGas,
-      },
+      options,
       (err, transactionHash) => {
         if (err) debug(err);
         else debug('Result: %s', transactionHash);
-        cb && cb(err, {account: account, transactionHash});
+        cb && cb(err, {account: options.from, transactionHash});
       },
     ];
     if (functionSpec.constant) {
