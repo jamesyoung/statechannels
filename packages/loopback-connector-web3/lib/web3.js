@@ -65,19 +65,21 @@ class Web3Connector {
 
     const ctor = this.abiContractBuilder.getConstructor();
 
-    model.create = contractConstructorFactory(
-      this,
-      contractClass,
-      this.defaultAccount,
-      gas,
-    );
+    if (ctor != null) {
+      model.create = contractConstructorFactory(
+        this,
+        contractClass,
+        this.defaultAccount,
+        gas,
+      );
 
-    setRemoting(
-      model.create,
-      Object.assign(ctor, {
-        http: {verb: 'post', path: '/'},
-      }),
-    );
+      setRemoting(
+        model.create,
+        Object.assign(ctor, {
+          http: {verb: 'post', path: '/'},
+        }),
+      );
+    }
 
     this.defineMethods(model, gas);
   }

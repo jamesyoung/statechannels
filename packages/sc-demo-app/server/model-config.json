@@ -15,6 +15,18 @@
   },
   "channel": {
     "dataSource": "web3",
+    "public": false
+  },
+  "GlobalClick": {
+    "dataSource": "web3",
+    "public": true
+  },
+  "UserClick": {
+    "dataSource": "web3",
+    "public": true
+  },
+  "Payment": {
+    "dataSource": "web3",
     "public": true
   }
 }
