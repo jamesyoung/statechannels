@@ -61,27 +61,27 @@ A number of scenarios have been created to show the following progression:
 - demo 3: state channels
 - demo 4: account abstraction
 
-##demo #1
+## demo #1
 
-###goal
+### goal
 to demo a baseline scenario where users interacting with a hub as an intermediary can
 update a smartcontract if they have value in their account
 
-###players
+### players
 raymond is the advertiser
 james is a publisher
 al is a publisher
 
-###hub
+### hub
 hub is a marketplace that brings advertisers together with publishers
 hub keeps track of clicks through the blockchain
 hub hosts `/clicks` API through LB
 hub interacts with the smartcontract that keeps track of global counter of clicks
 
-###initial account balances
+### initial account balances
 hub has account hub.eth with 5 eth
 
-###steps
+### steps
 
 __step 1__
 
@@ -118,30 +118,30 @@ hub ETH goes down to 4.998 ETH
 
 al receives the clicks counter state as a string - `2` from the api call
 
-##demo #2
+## demo #2
 
-###goal
+### goal
 to demo a baseline scenario where users interacting with a hub as an intermediary can
 update a smartcontract without value in their account
 
-###players
+### players
 raymond is the advertiser
 james is the publisher
 al is a publisher
 
-###hub
+### hub
 hub is a marketplace that brings advertisers together with publishers
 hub keeps track of clicks through the blockchain
 hub hosts `/clicks/<user>` API through LB
 hub interacts with the smartcontract that keeps track of global counter of clicks
 hub interacts with the smartcontract that keeps track of user counter of clicks
 
-###initial account balances
+### initial account balances
 hub has account hub.eth with 5 eth
 james has account james.eth with 0 eth and just a set of keys
 al has account al.eth with 0 ETH and just a set of keys
 
-###steps
+### steps
 
 __step 1__
 
@@ -171,24 +171,24 @@ hub updates state:
 
 al receives the clicks counter state as a string - `1` from the api call
 
-##demo #3
+## demo #3
 
-###goal
+### goal
 to demo state channels where sender has ETH and receiver has no ETH
 
-###players
+### players
 raymond is the advertiser
 james is the publisher
 al is a publisher
 
-###hub
+### hub
 hub is a marketplace that brings advertisers together with publishers
 hub keeps track of clicks through the blockchain
 hub hosts `/clicks/<user>` API through LB
 hub interacts with the smartcontract that keeps track of global counter of clicks
 hub interacts with the smartcontract that keeps track of user counter of clicks
 
-###initial account balances
+### initial account balances
 hub has account hub.eth with 5 eth
 james has account james.eth with 5 eth and just a set of keys
 al has account al.eth with 0 ETH and just a set of keys
