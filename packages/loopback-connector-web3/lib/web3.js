@@ -124,6 +124,15 @@ class Web3Connector {
         },
         isStatic: true,
       });
+      if (!method.functionSpec.constant) {
+        remotingSpec.returns = [
+          {
+            arg: 'data',
+            type: 'object',
+            root: true,
+          },
+        ];
+      }
       remotingSpec.accepts = [addressArg].concat(method.accepts);
       model.remoteMethod(method.name, remotingSpec);
     });
