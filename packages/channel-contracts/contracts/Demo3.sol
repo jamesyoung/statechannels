@@ -5,8 +5,8 @@ import "./SafeMath.sol";
 contract Demo3 {
     using SafeMath for uint256;
 
-    address hub;
-    uint256 percentageFee;
+    address public hub;
+    uint256 public percentageFee;
 
     struct Deposit {
         uint256 amount;
