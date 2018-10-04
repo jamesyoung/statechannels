@@ -1,4 +1,5 @@
 {
   "editor.formatOnSave": true,
-  "files.autoSave": "afterDelay"
+  "files.autoSave": "afterDelay",
+  "eslint.enable": false
 }

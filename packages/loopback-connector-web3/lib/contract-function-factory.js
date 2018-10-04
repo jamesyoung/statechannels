@@ -61,9 +61,9 @@ function contractFunctionFactory(
       from: from || contractMetadata.options.from || connector.defaultAccount,
       gas: gas || contractMetadata.options.gas || connector.defaultGas,
     };
-    const params = args.slice(0, args.length - 1);
+    const params = args.slice(1, args.length - 1);
     const cb = args[args.length - 1];
-    const address = this.address.toString(16);
+    const address = args[0];
     debug('Invoking contract method %s: %j', functionSpec.name, params);
     const contract = new connector.web3.eth.Contract(
       contractMetadata.options.abi,

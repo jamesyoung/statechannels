@@ -30,6 +30,14 @@ class Web3Connector {
     });
   }
 
+  sign(data, account, cb) {
+    if (typeof account === 'function') {
+      cb = account;
+      account = undefined;
+    }
+    return this.web3.eth.sign(account || this.defaultAccount, data, cb);
+  }
+
   define(modelData) {
     const web3 = this.web3;
     const modelClass = modelData.model;
@@ -91,20 +99,33 @@ class Web3Connector {
     const methods = this.contractInspector.getMethods();
 
     methods.map(method => {
-      model.prototype[method.name] = contractFunctionFactory(
+      model[method.name] = contractFunctionFactory(
         this,
         contractMetadata,
         method.functionSpec,
         this.defaultAccount,
         gas,
       );
-      model.remoteMethod(
-        method.name,
-        Object.assign(method, {
-          http: {verb: 'post', path: '/' + method.name},
-          isStatic: false,
-        }),
-      );
+      // Add `address` as the 1st argument
+      const addressArg = {
+        arg: 'address',
+        description: `Address of the deployed contract ${
+          contractMetadata.contractName
+        }`,
+        http: {source: 'path'},
+        type: 'string',
+        required: true,
+      };
+      const remotingSpec = Object.assign({}, method, {
+        http: {
+          // Mapping constant functions to `get`
+          verb: method.functionSpec.constant ? 'get' : 'post',
+          path: '/:address/' + method.name,
+        },
+        isStatic: true,
+      });
+      remotingSpec.accepts = [addressArg].concat(method.accepts);
+      model.remoteMethod(method.name, remotingSpec);
     });
   }
 }
