@@ -51,6 +51,8 @@ class Web3Connector {
       bytecode = etherumConfig.compliedContract.bytecode;
     }
     const contractClass = new web3.eth.Contract(abi);
+    contractClass.options.abi = abi;
+    contractClass.options.jsonInterface = abi;
     contractClass.options.data = bytecode;
     contractClass.options.from = this.defaultAccount;
 
@@ -65,29 +67,32 @@ class Web3Connector {
 
     const ctor = this.abiContractBuilder.getConstructor();
 
-    model.create = contractConstructorFactory(
-      this,
-      contractClass,
-      this.defaultAccount,
-      gas,
-    );
+    if (ctor != null) {
+      model.create = contractConstructorFactory(
+        this,
+        contractClass,
+        this.defaultAccount,
+        gas,
+      );
 
-    setRemoting(
-      model.create,
-      Object.assign(ctor, {
-        http: {verb: 'post', path: '/'},
-      }),
-    );
+      setRemoting(
+        model.create,
+        Object.assign(ctor, {
+          http: {verb: 'post', path: '/'},
+        }),
+      );
+    }
 
-    this.defineMethods(model, gas);
+    this.defineMethods(contractClass, model, gas);
   }
 
-  defineMethods(model, gas) {
+  defineMethods(contractClass, model, gas) {
     const methods = this.abiContractBuilder.getMethods();
 
     methods.map(method => {
       model.prototype[method.name] = contractFunctionFactory(
         this,
+        contractClass,
         method.functionSpec,
         this.defaultAccount,
         gas,
