@@ -6,12 +6,11 @@ const {loadContract} = require('./solidity-helper');
 const {
   contractConstructorFactory,
   contractFunctionFactory,
-} = require('./contract-helper');
-const {AbiModelBuilder} = require('./abi-model-builder');
+} = require('./contract-function-factory');
+const {ContractInspector} = require('./contract-inspector');
 
 class Web3Connector {
   constructor(settings) {
-    this.contracts = {};
     this.name = settings.name || 'web3';
     this.settings = settings;
 
@@ -33,10 +32,12 @@ class Web3Connector {
 
   define(modelData) {
     const web3 = this.web3;
-    const model = modelData.model;
+    const modelClass = modelData.model;
 
-    // all models must have an ID property, and we want this model to have a String ID property
-    model.defineProperty('id', {type: String, id: true});
+    /**
+     * Add contract address as the ID
+     */
+    modelClass.defineProperty('address', {type: String, id: true});
 
     const etherumConfig = modelData.settings.ethereum || {};
 
@@ -50,49 +51,49 @@ class Web3Connector {
       abi = etherumConfig.compliedContract.abi;
       bytecode = etherumConfig.compliedContract.bytecode;
     }
-    const contractClass = new web3.eth.Contract(abi);
-    contractClass.options.abi = abi;
-    contractClass.options.jsonInterface = abi;
-    contractClass.options.data = bytecode;
-    contractClass.options.from = this.defaultAccount;
+    const contractMetadata = new web3.eth.Contract(abi);
+    contractMetadata.options.abi = abi;
+    contractMetadata.options.jsonInterface = abi;
+    contractMetadata.options.data = bytecode;
+    contractMetadata.options.from = this.defaultAccount;
 
     const gas = etherumConfig.gas;
-    contractClass.options.gas = gas;
+    contractMetadata.options.gas = gas;
 
-    this.abiContractBuilder = new AbiModelBuilder({
+    this.contractInspector = new ContractInspector({
       contractName,
       abi,
       bytecode,
     });
 
-    const ctor = this.abiContractBuilder.getConstructor();
+    const ctor = this.contractInspector.getConstructor();
 
     if (ctor != null) {
-      model.create = contractConstructorFactory(
+      modelClass.create = contractConstructorFactory(
         this,
-        contractClass,
+        contractMetadata,
         this.defaultAccount,
         gas,
       );
 
       setRemoting(
-        model.create,
+        modelClass.create,
         Object.assign(ctor, {
           http: {verb: 'post', path: '/'},
         }),
       );
     }
 
-    this.defineMethods(contractClass, model, gas);
+    this.defineMethods(contractMetadata, modelClass, gas);
   }
 
-  defineMethods(contractClass, model, gas) {
-    const methods = this.abiContractBuilder.getMethods();
+  defineMethods(contractMetadata, model, gas) {
+    const methods = this.contractInspector.getMethods();
 
     methods.map(method => {
       model.prototype[method.name] = contractFunctionFactory(
         this,
-        contractClass,
+        contractMetadata,
         method.functionSpec,
         this.defaultAccount,
         gas,

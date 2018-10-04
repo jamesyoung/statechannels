@@ -1,4 +1,4 @@
-const AbiModelBuilder = require('../lib/abi-model-builder').AbiModelBuilder;
+const AbiModelBuilder = require('../lib/contract-inspector').ContractInspector;
 const expect = require('should/as-function');
 expect.use((should, assertion) => {
   assertion.addChain('to');

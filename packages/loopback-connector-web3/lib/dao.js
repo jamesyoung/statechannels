@@ -2,9 +2,9 @@
 
 function Web3DAO() {}
 
-Web3DAO.findById = function(id, arg2, arg3, cb) {
+Web3DAO.findById = function(id, filter, options, cb) {
   var Model = this;
-  cb(null, new Model({id: id}));
+  cb(null, new Model({address: id}));
 };
 
 module.exports = Web3DAO;

@@ -51,14 +51,12 @@ function getType(solidityType) {
 }
 
 /**
- * Model builder from JSON ABI
+ * Contract inspector from JSON ABI
  */
-class AbiModelBuilder {
+class ContractInspector {
   constructor(contractSpec) {
     this.contractSpec = contractSpec;
   }
-
-  toModel() {}
 
   getMethods() {
     const functions = this.contractSpec.abi.filter(f => {
@@ -110,4 +108,4 @@ class AbiModelBuilder {
   }
 }
 
-exports.AbiModelBuilder = AbiModelBuilder;
+exports.ContractInspector = ContractInspector;

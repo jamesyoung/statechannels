@@ -28,5 +28,9 @@
   "Payment": {
     "dataSource": "web3",
     "public": true
+  },
+  "click": {
+    "dataSource": null,
+    "public": true
   }
 }
