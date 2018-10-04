@@ -24,14 +24,16 @@ module.exports = function(Click) {
 
   Click.signAndClick = (address, account, cb) => {
     const UserClick = Click.app.models.UserClick;
-    UserClick.dataSource.connector.sign('CLICK', account, (err, sig) => {
+    const connector = UserClick.dataSource.connector;
+    const msg = connector.web3.utils.sha3('CLICK');
+    connector.sign(msg, account, (err, sig) => {
       if (err) return cb && cb(err);
-      console.log(sig);
+      console.log('Signature: %s', sig);
       sig = sig.substr(2); //remove 0x
-      const r = '0x' + signature.slice(0, 64);
-      const s = '0x' + signature.slice(64, 128);
-      const v = '0x' + signature.slice(128, 130);
-      UserClick.click(address, v, r, s, cb);
+      const r = '0x' + sig.slice(0, 64);
+      const s = '0x' + sig.slice(64, 128);
+      const v = '0x' + sig.slice(128, 130);
+      UserClick.click(address, msg, v, r, s, cb);
     });
   };
 

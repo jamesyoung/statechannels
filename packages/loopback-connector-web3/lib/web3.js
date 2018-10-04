@@ -35,7 +35,7 @@ class Web3Connector {
       cb = account;
       account = undefined;
     }
-    return this.web3.eth.sign(account || this.defaultAccount, data, cb);
+    return this.web3.eth.sign(data, account || this.defaultAccount, cb);
   }
 
   define(modelData) {
