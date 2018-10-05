@@ -8,9 +8,9 @@ contract Demo2 {
 
     mapping(address => uint256) public clicks;
 
-    function click(bytes32 _hash, uint8 v, bytes32 r, bytes32 s) public {
-        require(msg.sender == ecrecover(_hash, v, r, s), "Demo2:click verification failed");
-        clicks[msg.sender]++;
+    function click(address _address, bytes32 _hash, bytes32 r, bytes32 s, uint8 v) public {
+        require(_address == ecrecover(_hash, v, r, s), "Demo2:click signature verification failed");
+        clicks[_address]++;
         count++;
     }
 }
