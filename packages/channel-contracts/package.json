@@ -27,7 +27,7 @@
     "lint:sol": "solium -d sol/contracts",
     "truffle:compile": "truffle compile --all",
     "truffle:console": "truffle console",
-    "truffle:migrate": "truffle migrate"
+    "truffle:migrate": "truffle migrate --reset"
   },
   "repository": {
     "type": "git",

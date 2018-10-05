@@ -45,9 +45,18 @@ module.exports = function(Click) {
       if (v_decimal != 27 || v_decimal != 28) {
         v_decimal += 27;
       }
+      console.log(v, v_decimal);
 
       const hashForVerify = messageHash(connector.web3, msg);
-      UserClick.click(address, hashForVerify, v_decimal, r, s, cb);
+      UserClick.click(
+        address,
+        account || connector.defaultAccount,
+        hashForVerify,
+        r,
+        s,
+        v_decimal,
+        cb,
+      );
     });
   };
 
@@ -67,6 +76,14 @@ module.exports = function(Click) {
         type: 'string',
         http: {source: 'query'},
         required: false,
+      },
+    ],
+    returns: [
+      // Transaction hash
+      {
+        arg: 'data',
+        type: 'object',
+        root: true,
       },
     ],
     http: {
