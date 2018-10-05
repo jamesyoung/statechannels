@@ -22,18 +22,32 @@ module.exports = function(Click) {
     },
   });
 
+  // eth_sign calculated the signature over keccak256("\x19Ethereum Signed Message:\n" + len(givenMessage) + givenMessage)))
+  // this gives context to a signature and prevents signing of transactions.
+  function messageHash(web3, msg) {
+    return web3.utils.sha3('\x19Ethereum Signed Message:\n' + msg.length + msg);
+  }
+
   Click.signAndClick = (address, account, cb) => {
     const UserClick = Click.app.models.UserClick;
     const connector = UserClick.dataSource.connector;
-    const msg = connector.web3.utils.sha3('CLICK');
-    connector.sign(msg, account, (err, sig) => {
+    const msg = 'CLICK';
+    const msgHex = '0x' + Buffer.from(msg).toString('hex');
+    connector.sign(msgHex, account, (err, sig) => {
       if (err) return cb && cb(err);
-      console.log('Signature: %s', sig);
+
       sig = sig.substr(2); //remove 0x
       const r = '0x' + sig.slice(0, 64);
       const s = '0x' + sig.slice(64, 128);
       const v = '0x' + sig.slice(128, 130);
-      UserClick.click(address, msg, v, r, s, cb);
+
+      var v_decimal = connector.web3.utils.hexToNumber(v);
+      if (v_decimal != 27 || v_decimal != 28) {
+        v_decimal += 27;
+      }
+
+      const hashForVerify = messageHash(connector.web3, msg);
+      UserClick.click(address, hashForVerify, v_decimal, r, s, cb);
     });
   };
 
