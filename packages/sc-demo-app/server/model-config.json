@@ -32,5 +32,9 @@
   "click": {
     "dataSource": null,
     "public": true
+  },
+  "transaction": {
+    "dataSource": "txstore",
+    "public": true
   }
 }

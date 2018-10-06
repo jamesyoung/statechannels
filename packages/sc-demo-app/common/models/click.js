@@ -2,7 +2,7 @@
 
 module.exports = function(Click) {
   Click.click = (address, cb) => {
-    return Click.app.models.GlobalClick.click(address, cb);
+    return Click.app.models.GlobalClick.click(address, saveTransaction(cb));
   };
 
   Click.remoteMethod('click', {
@@ -33,6 +33,7 @@ module.exports = function(Click) {
     const connector = UserClick.dataSource.connector;
     const msg = 'CLICK';
     const msgHex = '0x' + Buffer.from(msg).toString('hex');
+    cb = saveTransaction(cb);
     connector.sign(msgHex, account, (err, sig) => {
       if (err) return cb && cb(err);
 
@@ -45,7 +46,6 @@ module.exports = function(Click) {
       if (v_decimal != 27 || v_decimal != 28) {
         v_decimal += 27;
       }
-      console.log(v, v_decimal);
 
       const hashForVerify = messageHash(connector.web3, msg);
       UserClick.click(
@@ -91,4 +91,20 @@ module.exports = function(Click) {
       path: '/:address/signAndClick',
     },
   });
+
+  function saveTransaction(cb) {
+    return (err, result) => {
+      if (err) return cb && cb(err);
+      Click.app.models.transaction.create(
+        {
+          id: result.transactionHash,
+          account: result.account,
+          status: 'PENDING',
+        },
+        err2 => {
+          cb(err2, result);
+        },
+      );
+    };
+  }
 };

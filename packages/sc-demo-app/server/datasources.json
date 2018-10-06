@@ -3,5 +3,11 @@
     "url": "http://localhost:8545",
     "name": "web3",
     "connector": "loopback-connector-web3"
+  },
+  "txstore": {
+    "name": "txstore",
+    "localStorage": "",
+    "file": "",
+    "connector": "memory"
   }
 }
