@@ -2,6 +2,7 @@
 
 const Web3 = require('web3');
 const Web3DAO = require('./dao');
+const SolidityProject = require('./solidity-project');
 const {loadContract} = require('./solidity-helper');
 const {
   contractConstructorFactory,
@@ -10,22 +11,36 @@ const {
 const {ContractInspector} = require('./contract-inspector');
 
 class Web3Connector {
-  constructor(settings) {
+  constructor(dataSource) {
+    this.dataSource = dataSource;
+    const settings = dataSource.settings || {};
     this.name = settings.name || 'web3';
     this.settings = settings;
 
     const url = settings.url || 'http://localhost:8545';
     this.web3 = new Web3(url);
     this.DataAccessObject = Web3DAO;
+    if (this.settings.solidityProject) {
+      this.project = new SolidityProject(this.settings.solidityProject);
+    }
   }
 
-  connect(cb) {
+  _getAccounts(cb) {
     this.web3.eth.getAccounts((err, accounts) => {
       if (err) {
         return cb(err);
       }
-
       this.defaultAccount = accounts[0];
+      cb(null, accounts);
+    });
+  }
+
+  connect(cb) {
+    this._getAccounts((err, accounts) => {
+      if (err) {
+        return cb(err);
+      }
+      this.createModels();
       cb();
     });
   }
@@ -36,6 +51,28 @@ class Web3Connector {
       account = undefined;
     }
     return this.web3.eth.sign(data, account || this.defaultAccount, cb);
+  }
+
+  /**
+   * Create corresponding LoopBack models from solidity contracts
+   */
+  createModels() {
+    if (!this.project || this.modelsCreated) return;
+    this.modelsCreated = true;
+    const contracts = this.project.syncLoadJsonInterfaces();
+    for (const contract of contracts) {
+      const model = this.dataSource.createModel(
+        contract.contractName,
+        {},
+        {
+          ethereum: {
+            contract,
+          },
+          base: 'Model',
+        },
+      );
+      this.dataSource.app.model(model);
+    }
   }
 
   define(modelData) {
@@ -60,6 +97,7 @@ class Web3Connector {
       bytecode = etherumConfig.compliedContract.bytecode;
     }
     const contractMetadata = new web3.eth.Contract(abi);
+    contractMetadata.contractName = contractName;
     contractMetadata.options.abi = abi;
     contractMetadata.options.jsonInterface = abi;
     contractMetadata.options.data = bytecode;
@@ -136,6 +174,28 @@ class Web3Connector {
       remotingSpec.accepts = [addressArg].concat(method.accepts);
       model.remoteMethod(method.name, remotingSpec);
     });
+  }
+
+  automigrate(models, cb) {
+    if (this.project) {
+      this.project
+        .migrate({reset: true, from: this.defaultAccount})
+        .then(result => cb(null, result))
+        .catch(err => cb(err));
+    }
+  }
+
+  autoupdate(models, cb) {
+    if (this.project) {
+      this.project
+        .migrate({reset: false, from: this.defaultAccount})
+        .then(result => cb(null, result))
+        .catch(err => cb(err));
+    }
+  }
+
+  ping(cb) {
+    this.getAccounts(cb);
   }
 }
 

@@ -1,10 +1,9 @@
 'use strict';
 
-var Web3Connector = require('./lib/web3');
+const Web3Connector = require('./lib/web3');
 
 exports.initialize = function(dataSource, cb) {
-  var settings = dataSource.settings;
-  var connector = new Web3Connector(settings);
+  const connector = new Web3Connector(dataSource);
   connector.dataSource = dataSource;
   dataSource.connector = connector;
   if (cb) {
@@ -13,7 +12,7 @@ exports.initialize = function(dataSource, cb) {
         cb();
       });
     } else {
-      dataSource.connector.connect(cb);
+      connector.connect(cb);
     }
   }
 };

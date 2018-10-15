@@ -2,7 +2,7 @@
 
 module.exports = function(Click) {
   Click.click = (address, cb) => {
-    return Click.app.models.GlobalClick.click(address, saveTransaction(cb));
+    return Click.app.models.Demo1.click(address, saveTransaction(cb));
   };
 
   Click.remoteMethod('click', {
@@ -29,7 +29,7 @@ module.exports = function(Click) {
   }
 
   Click.signAndClick = (address, account, cb) => {
-    const UserClick = Click.app.models.UserClick;
+    const UserClick = Click.app.models.Demo2;
     const connector = UserClick.dataSource.connector;
     const msg = 'CLICK';
     const msgHex = '0x' + Buffer.from(msg).toString('hex');

@@ -2,7 +2,8 @@
   "web3": {
     "url": "http://localhost:8545",
     "name": "web3",
-    "connector": "loopback-connector-web3"
+    "connector": "loopback-connector-web3",
+    "solidityProject": "../channel-contracts"
   },
   "txstore": {
     "name": "txstore",
