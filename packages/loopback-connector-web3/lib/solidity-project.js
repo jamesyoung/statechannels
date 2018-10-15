@@ -1,5 +1,7 @@
 'use strict';
 
+const temp = require('temp');
+temp.track();
 const promisify = require('util').promisify;
 const glob = promisify(require('glob'));
 const path = require('path');
@@ -11,9 +13,11 @@ const truffleMigrate = promisify(
 );
 const truffleResolver = require('truffle-resolver');
 const truffleProvider = require('truffle-provider');
-const artifactor = require('truffle-artifactor');
+const truffleConfig = require('truffle-config');
+const Artifactor = require('truffle-artifactor');
 const solc = require('solc');
 const debug = require('debug')('loopback:connector:web3');
+const mkdir = promisify(temp.mkdir.bind(temp));
 
 function compile(options, cb) {
   truffleCompile(options, function(err, jsonInterfaces, files) {
@@ -24,26 +28,18 @@ function compile(options, cb) {
 const compileAsync = promisify(compile);
 
 class SolidityProject {
-  constructor(rootDir) {
+  constructor(rootDir, network = 'development') {
     this.rootDir = path.resolve(rootDir);
-    this.options = {
+    const options = {
       working_directory: this.rootDir,
       contracts_directory: path.resolve(this.rootDir, 'contracts'),
       contracts_build_directory: path.resolve(this.rootDir, 'build/contracts'),
       migrations_directory: path.resolve(this.rootDir, 'migrations'),
-      network: '*',
+      network,
       network_id: '*',
     };
-    this.options.resolver = new truffleResolver(this.options);
-    try {
-      const truffleJs = path.resolve(this.rootDir, 'truffle.js');
-      const truffleConfig = require(truffleJs);
-      let networks = truffleConfig.networks;
-      networks = networks || {};
-      Object.assign(this.options, Object.values(networks)[0]);
-    } catch (err) {
-      // Ignore
-    }
+    this.options = truffleConfig.detect(options);
+    debug('Options', this.options);
   }
 
   async loadJsonInterfaces() {
@@ -76,18 +72,18 @@ class SolidityProject {
       this.options,
       options,
     );
+    options.resolver = new truffleResolver(options);
+    debug('Compile', options);
     return await compileAsync(options);
   }
 
   async migrate(options) {
-    options = Object.assign(
-      {
-        artifactor,
-      },
-      this.options,
-      options,
-    );
-    options.provider = truffleProvider.create(options || {});
+    const tempDir = await mkdir('migrate-dry-run-');
+    options = this.options.with(options || {});
+    options.artifactor = new Artifactor(tempDir);
+    options.provider = truffleProvider.create(options);
+    options.resolver = new truffleResolver(options);
+    debug('Migrate', options);
     return await truffleMigrate(options);
   }
 }
