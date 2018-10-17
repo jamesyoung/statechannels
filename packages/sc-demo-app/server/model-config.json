@@ -20,5 +20,21 @@
   "transaction": {
     "dataSource": "txstore",
     "public": true
+  },
+  "channel": {
+    "dataSource": "txstore",
+    "public": true
+  },
+  "message": {
+    "dataSource": "txstore",
+    "public": false
+  },
+  "user": {
+    "dataSource": "txstore",
+    "public": true
+  },
+  "service": {
+    "dataSource": "txstore",
+    "public": true
   }
 }
