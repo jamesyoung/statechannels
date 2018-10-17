@@ -18,23 +18,23 @@
     "public": true
   },
   "transaction": {
-    "dataSource": "txstore",
+    "dataSource": "store",
     "public": true
   },
   "channel": {
-    "dataSource": "txstore",
+    "dataSource": "store",
     "public": true
   },
   "message": {
-    "dataSource": "txstore",
+    "dataSource": "store",
     "public": false
   },
   "user": {
-    "dataSource": "txstore",
+    "dataSource": "store",
     "public": true
   },
   "service": {
-    "dataSource": "txstore",
+    "dataSource": "store",
     "public": true
   }
 }

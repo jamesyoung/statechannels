@@ -5,10 +5,8 @@
     "connector": "loopback-connector-web3",
     "solidityProject": "../channel-contracts"
   },
-  "txstore": {
-    "name": "txstore",
-    "localStorage": "",
-    "file": "",
+  "store": {
+    "name": "store",
     "connector": "memory"
   }
 }
