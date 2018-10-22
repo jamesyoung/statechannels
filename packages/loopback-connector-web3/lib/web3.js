@@ -112,22 +112,24 @@ class Web3Connector {
       bytecode,
     });
 
-    const ctor = this.contractInspector.getConstructor();
+    if (etherumConfig.includeConstructor || this.settings.includeConstructor) {
+      const ctor = this.contractInspector.getConstructor();
 
-    if (ctor != null) {
-      modelClass.create = contractConstructorFactory(
-        this,
-        contractMetadata,
-        this.defaultAccount,
-        gas,
-      );
+      if (ctor != null) {
+        modelClass.create = contractConstructorFactory(
+          this,
+          contractMetadata,
+          this.defaultAccount,
+          gas,
+        );
 
-      setRemoting(
-        modelClass.create,
-        Object.assign(ctor, {
-          http: {verb: 'post', path: '/'},
-        }),
-      );
+        setRemoting(
+          modelClass.create,
+          Object.assign(ctor, {
+            http: {verb: 'post', path: '/'},
+          }),
+        );
+      }
     }
 
     this.defineMethods(contractMetadata, modelClass, gas);
