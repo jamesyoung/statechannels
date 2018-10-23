@@ -2,18 +2,22 @@
 
 ## Parties involved
 
-- Service provider (tic-tak-toe game server)
+- Service provider (tic-tac-toe game server)
 
   - Host the game
-  - Register with State channel hub with its webhook
+  - Register with State channel hub with a
+    [webhook](https://en.wikipedia.org/wiki/Webhook)
 
 - End users (game players: Bob and Alice)
 
-  - Register with State channel as users (email, public keys)
+  - Register with State channel hub as users (email, public keys)
 
 - State channel hub
 
   - Manage users and service providers
+  - Proxy between end users and service providers to exchange signed messages
+  - Manage life cycles of channels
+  - Store signed messages
 
 - Block chain
   - Settle final state of state channel on the chain
@@ -62,7 +66,7 @@ GET /api/channels/{id}/messages
 POST /api/channels/{id}/messages
 
 - store signed messages (private)
-- forward requests to the counter-party service (tic-tak-toe game server)
+- forward requests to the counter-party service (tic-tac-toe game server)
 
 #### User
 
@@ -79,19 +83,19 @@ POST /api/channels/{id}/messages
 ## Flow
 
 1. A service provider registers itself with the hub as an application
-   `tic-tak-toe`.
+   `tic-tac-toe`.
 2. User (Bob) sign up with the hub with 2FA and register his public keys
-3. The hub publishes `tic-tak-toe` after verification of the webhook
-4. Now Bob sees the `tic-tak-toe` and wants to play with Alice.
+3. The hub publishes `tic-tac-toe` after verification of the webhook
+4. Now Bob sees the `tic-tac-toe` and wants to play with Alice.
 5. If Alice is not yet a user with the hub, the hub will send an invitation to
    Alice's email to invite Alice sign up with the hub and play
-6. The hub creates a channel for Bob to play `tic-tak-toe`. Each instance is
+6. The hub creates a channel for Bob to play `tic-tac-toe`. Each instance is
    identified by the channel address/id.
 7. Bod uses the front-end to send first move (signed with his private key) as an
    API request to the hub
 8. The hub verifies the request using Bob's public key
 9. The hub stores the signed message from Bob
-10. The hub forwards the message to the `tic-tak-toe` service using the webhook,
+10. The hub forwards the message to the `tic-tac-toe` service using the webhook,
     receives the response and passes it back to Bob
 11. The hub notifies Alice?
 12. Repeat the play between Alice and Bob
