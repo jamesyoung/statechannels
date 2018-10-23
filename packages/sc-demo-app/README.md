@@ -1,5 +1,7 @@
 # State Channels Demo Application
 
+![Demo 3](demo-3.png)
+
 ## Parties involved
 
 - Service provider (tic-tac-toe game server)
