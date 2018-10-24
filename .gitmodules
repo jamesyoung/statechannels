@@ -1,0 +1,3 @@
+[submodule "packages/loopback-connector-web3"]
+	path = packages/loopback-connector-web3
+	url = git@github.com:LunchBadger/loopback-connector-web3.git
