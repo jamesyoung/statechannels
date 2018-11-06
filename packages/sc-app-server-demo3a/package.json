@@ -1,0 +1,35 @@
+{
+  "name": "sc-demo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "npm test",
+    "build:client": "node scripts/client_bundler.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bn.js": "^4.11.8",
+    "body-parser": "^1.18.3",
+    "channel-contracts": "^0.1.0",
+    "compression": "^1.0.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.4",
+    "helmet": "^3.10.0",
+    "loopback": "^3.22.0",
+    "loopback-component-explorer": "^6.2.0",
+    "loopback-connector-web3": "^0.1.0",
+    "moment": "^2.22.2",
+    "serve-favicon": "^2.0.1",
+    "strong-error-handler": "^3.0.0",
+    "web3": "^1.0.0-beta.36",
+    "web3-utils": "^1.0.0-beta.36"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "ethereumjs-util": "^6.0.0",
+    "loopback-boot": "^2.27.1"
+  }
+}

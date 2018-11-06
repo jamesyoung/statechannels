@@ -1,0 +1,63 @@
+{
+  "name": "channel",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "signedTransaction": {
+      "type": "string"
+    },
+    "payer": {
+      "type": "string",
+      "required": true
+    },
+    "payee": {
+      "type": "string",
+      "required": true
+    },
+    "amount": {
+      "type": "string",
+      "required": true
+    },
+    "total": {
+      "type": "string",
+      "required": false
+    },
+    "timeout": {
+      "type": "date",
+      "required": true
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "closedAt": {
+      "type": "date"
+    },
+    "closed": {
+      "type": "boolean"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "messages": {
+      "type": "hasMany",
+      "model": "message",
+      "foreignKey": "channelAddress",
+      "options": {
+        "nestRemoting": true
+      }
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

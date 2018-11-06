@@ -7,7 +7,10 @@ It contains the following packages:
 
 - channel-contracts: Solidity contracts for the state channel
 - loopback-connector-web3: Web3 Connector for LoopBack 3.x
-- sc-demo-app: A demo application
+- sc-demo-app: A demo application (clicks demo)
+- sc-hub: The hub
+- sc-app-server-demo3: The payment channel impression demo server
+- sc-app-frontend-demo3: The payment channel impression demo frontend
 
 # Getting started
 

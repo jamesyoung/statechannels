@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "impression": {
+    "dataSource": "store",
+    "public": true
+  },
+  "transaction": {
+    "dataSource": "store",
+    "public": true
+  },
+  "channel": {
+    "dataSource": "store",
+    "public": true
+  },
+  "message": {
+    "dataSource": "store",
+    "public": false
+  },
+  "user": {
+    "dataSource": "store",
+    "public": true
+  },
+  "service": {
+    "dataSource": "store",
+    "public": true
+  }
+}

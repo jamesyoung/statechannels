@@ -1,0 +1,14 @@
+{
+  "_meta": {
+    "sources": [
+      "../../common/models",
+      "./models"
+    ]
+  },
+  "impression": {
+    "dataSource": "remote"
+  },
+  "channel": {
+    "dataSource": "remote"
+  }
+}

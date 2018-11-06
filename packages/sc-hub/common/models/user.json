@@ -1,0 +1,40 @@
+{
+  "name": "user",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
+    "email": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string",
+      "required": false
+    },
+    "publicKey": {
+      "type": "string"
+    },
+    "publicAddress": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "applications": {
+      "type": "hasMany",
+      "model": "application",
+      "foreignKey": "userId",
+      "options": {
+        "nestRemoting": true
+      }
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
