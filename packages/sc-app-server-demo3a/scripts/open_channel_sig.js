@@ -10,7 +10,7 @@ const tenPow18 = big(10).pow(big(18))
 const oneEth = big(1).mul(tenPow18)
 const tenEth = big(10).mul(tenPow18)
 
-const contract = require('../../channel-contracts/build/contracts/Demo3b.json')
+const contract = require('../../channel-contracts/build/contracts/Demo3a.json')
 const abi = contract.abi
 const contractAddress = contract.networks[Object.keys(contract.networks)[0]].address
 
