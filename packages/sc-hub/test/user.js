@@ -20,7 +20,7 @@ describe('/user', function () {
       })
   })
 
-  it('Post a new user', function (done) {
+  it('Post - a new user', function (done) {
     request.post('/api/users').send({
       email: 'alice@example.com',
       publicAddress: '0xc776e37126bc5fa0e12e775416bb59e4884f8b2f',

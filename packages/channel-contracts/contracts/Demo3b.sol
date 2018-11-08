@@ -32,6 +32,7 @@ contract Demo3b {
         payers[msg.sender].payer = msg.sender;
     }
 
+    // NOTE: this is a basic contract for a quick demo, it's not secured at all!
     function withdraw(bytes32 _hash, bytes32 r, bytes32 s, uint8 v, uint256 value, address payer, address receiver) public {
         require(payers[payer].amount >= value, "Channel:withdraw overdrawn");
         require(payers[payer].complete == false, "Channel:withdraw withdrawn");
@@ -43,10 +44,11 @@ contract Demo3b {
         require(prefixedProof == _hash, "Channel:withdraw invalid proof");
 
         address signer = ecrecover(_hash, v, r, s);
-        require(signer == payer);
+        require(signer == payer || signer == hub);
         uint256 fee = payers[payer].amount.mul(percentageFee).div(100);
 
-        payers[payer].complete = true;
+        payers[payer].amount = payers[payer].amount.sub(value);
+        //payers[payer].complete = true;
         receiver.transfer(value);
     }
 }

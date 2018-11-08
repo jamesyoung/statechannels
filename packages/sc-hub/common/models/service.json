@@ -1,0 +1,30 @@
+{
+  "name": "service",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
+    "description": {
+      "type": "string"
+    },
+    "webhook": {
+      "type": "string"
+    },
+    "publicKey": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

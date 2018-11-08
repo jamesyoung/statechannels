@@ -3,12 +3,9 @@
 const assert = require('assert')
 const moment = require('moment')
 const {
-  sha3,
-  sign,
   prefixMsg,
   getAccount,
   getWeb3,
-  toWei,
   toEth,
 } = require('../../lib/helpers')
 const contract = require('../../lib/contract')
@@ -57,9 +54,6 @@ module.exports = function(Channel) {
         // TODO: add listener for when tx is complete
         setTimeout(async () => {
           try {
-            // check channel exists
-            const info = await contract.info(account, web3)
-
             const staked = toEth(value)
 
             // store in db
@@ -114,7 +108,23 @@ module.exports = function(Channel) {
   // close state channel
   Channel.closeChannel = (payload, cb) => {
     ;(async () => {
-      // TODO
+        const web3 = getWeb3(Channel)
+        const { r, s, v, sig, hash, to:receiver, from:payer, value:total } = payload.state
+        const signer = await getAccount(web3)
+        const msg = prefixMsg(hash)
+
+        const result = await contract.close({msg, r, s, v, total, payer, receiver}, signer, web3)
+
+        assert.equal(result.status, true, 'did not receive successful status')
+
+      try {
+        cb(null, {
+          closed: true,
+          txHash: result.transactionHash
+        })
+      } catch(err) {
+        cb(err.message, null)
+      }
     })();
   }
 

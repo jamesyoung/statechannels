@@ -33,6 +33,9 @@
     },
     "nonce": {
       "type": "string"
+    },
+    "state": {
+      "type": "object"
     }
   },
   "validations": [],

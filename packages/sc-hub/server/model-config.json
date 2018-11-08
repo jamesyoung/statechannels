@@ -32,5 +32,9 @@
   "application": {
     "dataSource": "store",
     "public": true
+  },
+  "service": {
+    "dataSource": "store",
+    "public": true
   }
 }

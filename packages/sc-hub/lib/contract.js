@@ -16,11 +16,11 @@ async function info(account, web3) {
 }
 
 // close payment channel
-async function close(data, account, web3) {
-  const {msg, r, s, v, total, signer} = data
+async function close(data, signer, web3) {
+  const {msg, r, s, v, total, payer, receiver} = data
   const instance = new web3.eth.Contract(abi, address)
-  const result = await instance.methods.withdraw(msg, r, s, v, total, signer).send({
-    from: account
+  const result = await instance.methods.withdraw(msg, r, s, v, total, payer, receiver).send({
+    from: signer
   })
 
   return result
@@ -37,9 +37,18 @@ async function open(payee, value, timeout, account, web3) {
   return result
 }
 
+// get user state channel balance
+async function getBalance(payer, web3) {
+  const instance = new web3.eth.Contract(abi, address)
+  const result = await instance.methods.payers(payer).call()
+
+  return big(result.amount)
+}
+
 module.exports = {
   address,
   info,
   close,
   open,
+  getBalance
 }

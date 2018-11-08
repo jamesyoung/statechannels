@@ -1,6 +1,7 @@
 const Web3 = require('web3')
 const {soliditySha3: sha3} = require('web3-utils')
 const util = require('ethereumjs-util')
+const BN = require('bn.js')
 
 const provider = new Web3.providers.HttpProvider('http://localhost:8545')
 const web3 = new Web3(provider)
@@ -50,8 +51,8 @@ function getWeb3(Model) {
 }
 
 async function getAccount(web3) {
-  // account 1 for testing
-  return (await web3.eth.getAccounts())[1]
+  // account 0 for testing
+  return (await web3.eth.getAccounts())[0]
 }
 
 async function getBalance(account) {
@@ -71,6 +72,8 @@ function toEth(value) {
   return web3.utils.fromWei(`${value||0}`, 'ether')
 }
 
+const toBig = (n) => new BN(n.toString(10))
+
 module.exports = {
   getConnector,
   getWeb3,
@@ -82,4 +85,5 @@ module.exports = {
   getBalance,
   toWei,
   toEth,
+  toBig
 }

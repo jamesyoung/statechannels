@@ -23,7 +23,7 @@ describe('/application', function () {
       })
   })
 
-  it('Post a new application', function (done) {
+  it('Post - a new application', function (done) {
     request.post('/api/applications').send({
       name: 'My App',
       description: 'A cool app',
