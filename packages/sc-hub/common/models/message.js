@@ -3,6 +3,7 @@
 const assert = require('assert')
 const moment = require('moment')
 const _ = require('lodash')
+const request = require('request-promise')
 const {
   sha3,
   sign,
@@ -55,24 +56,18 @@ module.exports = function(Message) {
           total = total.add(pay)
         }
 
-        const hash = sha3(
-          {type: 'address', value: contract.address},
-          {type: 'address', value: payee},
-          {type: 'uint256', value: total.toString()}
-        )
+        const url = 'http://localhost:9999/webhook'
 
-        const {r, s, v, sig, msg} = await sign(hash, signer, web3)
+        const appResp = await request.post(url, {
+          body: {
+            value: total.toString(),
+            payee,
+            contractAddress: contract.address,
+          },
+          json: true
+        })
 
-        const state = {
-            r,
-            s,
-            v,
-            sig,
-            hash,
-            from: payer,
-            to: payee,
-            value: total.toString()
-        }
+        const { state } = appResp
 
         // store in db
         await createMessage(Message, {

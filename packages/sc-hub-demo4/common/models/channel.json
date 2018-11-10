@@ -1,0 +1,54 @@
+{
+  "name": "channel",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
+    "contractAddress": {
+      "type": "string"
+    },
+    "account": {
+      "type": "string"
+    },
+    "staked": {
+      "type": "string"
+    },
+    "timeout": {
+      "type": "date"
+    },
+    "applicationId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "closedAt": {
+      "type": "date"
+    },
+    "closed": {
+      "type": "boolean"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "messages": {
+      "type": "hasMany",
+      "model": "message",
+      "foreignKey": "channelAddress",
+      "options": {
+        "nestRemoting": true
+      }
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

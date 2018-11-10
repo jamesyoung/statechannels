@@ -18,7 +18,11 @@ build/client/loopback/demo3a:
 
 .PHONY: build/client/loopback/demo4
 build/client/loopback/demo4:
-	@(cd packages/sc-hub && npm run build:client) && cp packages/sc-hub/client/build/loopback.bundle.js packages/sc-app-frontend-demo4/public/js/
+	@(cd packages/sc-hub-demo4 && npm run build:client) && cp packages/sc-hub-demo4/client/build/loopback.bundle.js packages/sc-app-frontend-demo4/public/js/
+
+.PHONY: build/client/loopback/demo5
+build/client/loopback/demo5:
+	@(cd packages/sc-hub && npm run build:client) && cp packages/sc-hub/client/build/loopback.bundle.js packages/sc-app-frontend-demo5/public/js/
 
 .PHONY: start
 start:
@@ -32,9 +36,17 @@ start/frontend/demo3a:
 start/frontend/demo4:
 	@(cd packages/sc-app-frontend-demo4 && PORT=8080 npm start)
 
+.PHONY: start/frontend/demo5
+start/frontend/demo5:
+	@(cd packages/sc-app-frontend-demo5 && PORT=8080 npm start)
+
 .PHONY: start/server/demo3a
 start/server/demo3a:
 	@(cd packages/sc-app-server-demo3a && npm start)
+
+.PHONY: start/server/demo5
+start/server/demo5:
+	@(cd packages/sc-app-server-demo5 && PORT=9999 npm start)
 
 .PHONY: start/hub
 start/hub:

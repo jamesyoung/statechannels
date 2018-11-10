@@ -1,0 +1,42 @@
+{
+  "name": "sc-hub-demo4",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "node .",
+    "posttest": "npm run lint",
+    "build:client": "node scripts/client_bundler.js"
+  },
+  "dependencies": {
+    "bn.js": "^4.11.8",
+    "channel-contracts": "^0.1.0",
+    "compression": "^1.0.3",
+    "cors": "^2.5.2",
+    "ethereumjs-util": "^6.0.0",
+    "helmet": "^3.10.0",
+    "loopback": "^3.22.0",
+    "loopback-boot": "^2.6.5",
+    "loopback-component-explorer": "^6.2.0",
+    "loopback-connector-web3": "^0.1.0",
+    "moment": "^2.22.2",
+    "serve-favicon": "^2.0.1",
+    "strong-error-handler": "^3.0.0",
+    "web3": "^1.0.0-beta.36",
+    "web3-utils": "^1.0.0-beta.36"
+  },
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "license": "UNLICENSED",
+  "description": "sc-demo-app",
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "expect.js": "^0.3.1",
+    "mocha": "^5.2.0",
+    "supertest": "^3.3.0"
+  }
+}

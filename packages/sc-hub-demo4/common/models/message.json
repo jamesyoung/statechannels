@@ -1,0 +1,51 @@
+{
+  "name": "message",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
+    "channelId": {
+      "type": "string"
+    },
+    "channelAddress": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "body": {
+      "type": "object"
+    },
+    "signature": {
+      "type": "string"
+    },
+    "nonce": {
+      "type": "string"
+    },
+    "state": {
+      "type": "object"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "channel": {
+      "type": "belongsTo",
+      "model": "channel",
+      "foreignKey": "channelAddress"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

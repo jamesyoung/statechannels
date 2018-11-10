@@ -3,7 +3,7 @@ const BN = require('bn.js')
 
 const big = (n) => new BN(n.toString(10))
 
-const contractJSON = require('channel-contracts/build/contracts/Demo4.json')
+const contractJSON = require('channel-contracts/build/contracts/Demo5.json')
 const { abi, networks } = contractJSON
 const { address } = networks[Object.keys(networks)[0]]
 
