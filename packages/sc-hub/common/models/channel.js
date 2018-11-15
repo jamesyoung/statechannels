@@ -110,8 +110,10 @@ module.exports = function(Channel) {
     ;(async () => {
         const web3 = getWeb3(Channel)
         const { r, s, v, sig, hash, to:receiver, from:payer, value:total } = payload.state
-        const signer = await getAccount(web3)
+        const signer = await getAccount(web3, 0)
         const msg = prefixMsg(hash)
+
+        // TODO: hub close channel with alice (via webhook endpoint)
 
         const result = await contract.close({msg, r, s, v, total, payer, receiver}, signer, web3)
 

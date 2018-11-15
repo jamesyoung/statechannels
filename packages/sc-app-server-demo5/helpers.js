@@ -3,6 +3,10 @@ const {soliditySha3: sha3} = require('web3-utils')
 const util = require('ethereumjs-util')
 const BN = require('bn.js')
 
+const contractJSON = require('channel-contracts/build/contracts/Demo5.json')
+const { abi, networks } = contractJSON
+const { address } = networks[Object.keys(networks)[0]]
+
 const provider = new Web3.providers.HttpProvider('http://localhost:8545')
 const web3 = new Web3(provider)
 
@@ -51,7 +55,7 @@ function getWeb3(Model) {
 }
 
 async function getAccount(w3) {
-  // account 1 for testing
+  // account 1 for testing (alice)
   return (await (w3 || web3).eth.getAccounts())[1]
 }
 
@@ -72,7 +76,22 @@ function toEth(value) {
   return web3.utils.fromWei(`${value||0}`, 'ether')
 }
 
+function fromEth(value) {
+  return toBig(value).mul(toBig(18))
+}
+
 const toBig = (n) => new BN(n.toString(10))
+
+// close payment channel
+async function closeChannel(data, signer) {
+  const {msg, r, s, v, total, payer, receiver, contractAddress} = data
+  const instance = new web3.eth.Contract(abi, address)
+  const result = await instance.methods.withdraw(msg, r, s, v, total, payer, receiver).send({
+    from: signer
+  })
+
+  return result
+}
 
 module.exports = {
   getConnector,
@@ -85,5 +104,8 @@ module.exports = {
   getBalance,
   toWei,
   toEth,
-  toBig
+  fromEth,
+  toBig,
+  closeChannel,
+  contractAddress: address
 }

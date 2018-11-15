@@ -69,10 +69,10 @@ export async function getBalance(account) {
 }
 
 export async function openChannel(opts) {
-  const { value, timeout, account } = opts
+  const { value, hub, timeout, account } = opts
   const web3 = new Web3(getProvider())
   const instance = new web3.eth.Contract(abi, address)
-  const result = await instance.methods.deposit(timeout).send({
+  const result = await instance.methods.deposit(hub, timeout).send({
     from: account,
     value
   })

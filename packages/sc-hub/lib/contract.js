@@ -1,6 +1,10 @@
 const Web3 = require('web3')
 const BN = require('bn.js')
 
+const {
+  sha3
+} = require('./helpers')
+
 const big = (n) => new BN(n.toString(10))
 
 const contractJSON = require('channel-contracts/build/contracts/Demo5.json')
@@ -29,7 +33,7 @@ async function close(data, signer, web3) {
 // open payment channel
 async function open(payee, value, timeout, account, web3) {
   const instance = new web3.eth.Contract(abi, address)
-  const result = await instance.methods.deposit(timeout, payee).send({
+  const result = await instance.methods.deposit( payee, timeout).send({
     from: account,
     value: value
   })
@@ -38,11 +42,16 @@ async function open(payee, value, timeout, account, web3) {
 }
 
 // get user state channel balance
-async function getBalance(payer, web3) {
+async function getBalance(payer, payee, web3) {
   const instance = new web3.eth.Contract(abi, address)
-  const result = await instance.methods.payers(payer).call()
 
-  return big(result.amount)
+  const hash = sha3(
+    {type: 'address', value: payer},
+    {type: 'address', value: payee}
+  )
+  const result = await instance.methods.payers(hash.toString('hex')).call()
+
+  return result.amount
 }
 
 module.exports = {

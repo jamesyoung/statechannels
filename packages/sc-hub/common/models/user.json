@@ -33,6 +33,14 @@
       "options": {
         "nestRemoting": true
       }
+    },
+    "channels": {
+      "type": "hasMany",
+      "model": "channel",
+      "foreignKey": "account",
+      "options": {
+        "nestRemoting": true
+      }
     }
   },
   "acls": [],

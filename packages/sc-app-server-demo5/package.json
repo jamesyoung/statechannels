@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "moment": "^2.22.2",
-    "web3": "^1.0.0-beta.36"
+    "web3": "^1.0.0-beta.36",
+    "channel-contracts": "^0.1.0"
   }
 }

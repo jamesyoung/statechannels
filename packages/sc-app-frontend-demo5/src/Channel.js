@@ -6,7 +6,8 @@ import {
   openChannel,
   getConnectedAccount,
   isMetamaskConnected,
-  getConnectedNetwork
+  getConnectedNetwork,
+  getContractAddress
 } from './utils';
 
 const UI = {
@@ -116,8 +117,9 @@ class App extends Component {
       const value = toWei(amount)
       const account = getConnectedAccount()
       const timeout = moment().add(1, 'day').unix()
+      const hub = '0xb2b0f76ece233b8e4bb318e9d663bead67060ca8'
 
-      const result = await openChannel({value, timeout, account})
+      const result = await openChannel({value, timeout, account, hub})
 
       this.setState({
         output: {

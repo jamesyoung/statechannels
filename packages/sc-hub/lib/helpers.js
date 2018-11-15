@@ -47,12 +47,12 @@ function getConnector(Model) {
 }
 
 function getWeb3(Model) {
-  return getConnector(Model).web3
+  const con = getConnector(Model)
+  return con && con.web3 ? con.web3 : web3
 }
 
-async function getAccount(web3) {
-  // account 0 for testing
-  return (await web3.eth.getAccounts())[0]
+async function getAccount(web3, index) {
+  return (await web3.eth.getAccounts())[index>>0]
 }
 
 async function getBalance(account) {
@@ -72,6 +72,10 @@ function toEth(value) {
   return web3.utils.fromWei(`${value||0}`, 'ether')
 }
 
+function fromEth(value) {
+  return new BN(web3.utils.toWei(`${value||0}`, 'ether').toString(10), 10)
+}
+
 const toBig = (n) => new BN(n.toString(10))
 
 module.exports = {
@@ -85,5 +89,6 @@ module.exports = {
   getBalance,
   toWei,
   toEth,
+  fromEth,
   toBig
 }

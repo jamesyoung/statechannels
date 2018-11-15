@@ -11,7 +11,8 @@ const {
   getWeb3,
   toWei,
   toEth,
-  toBig
+  toBig,
+  fromEth
 } = require('../../lib/helpers')
 const contract = require('../../lib/contract')
 
@@ -20,8 +21,7 @@ module.exports = function(Message) {
     ;(async () => {
       try {
         const web3 = getWeb3(Message)
-        // the hub is the signer
-        const signer = await getAccount(web3)
+        const hub = await getAccount(web3, 0)
 
         const payer = payload.payer.toLowerCase()
         const payee = payload.from.toLowerCase()
@@ -34,7 +34,7 @@ module.exports = function(Message) {
 
         assert.ok(payerUser, `user with public address ${payer} is not registered`)
 
-        let totalStaked = await contract.getBalance(payer, web3)
+        let totalStaked = toBig((await contract.getBalance(hub, payee, web3)).toString(10))
 
         assert.ok(totalStaked.toString() != '0', `user ${payer} doesn't have a channel open`)
 
@@ -49,7 +49,8 @@ module.exports = function(Message) {
           from: payer
         })
 
-        const pay = toBig(1).mul(toBig(10).pow(toBig(17))) // 0.1 eth
+
+        const pay = toBig(fromEth(0.1).toString(10))
 
         // clamp total so it doesn't go over the locked eth amount
         if (used.add(pay).cmp(totalStaked) <= 0) {
@@ -60,9 +61,12 @@ module.exports = function(Message) {
 
         const appResp = await request.post(url, {
           body: {
-            value: total.toString(),
-            payee,
-            contractAddress: contract.address,
+            action: 'sign',
+            data: {
+              value: total.toString(),
+              payee,
+              contractAddress: contract.address,
+            }
           },
           json: true
         })

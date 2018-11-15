@@ -72,6 +72,9 @@ const UI = {
   `,
   TD: styled.td`
 
+  `,
+  TBody: styled.tbody`
+
   `
 }
 
@@ -128,12 +131,12 @@ class App extends Component {
 
     let { table, error } = this.state
 
-    table = (<UI.Table>{table.map((x, i) => {
+    table = (<UI.Table><UI.TBody>{table.map((x, i) => {
       return (<UI.TR key={i}>
         <UI.TD>{Object.keys(x)[0]}</UI.TD>
         <UI.TD>{Object.values(x)[0]}</UI.TD>
       </UI.TR>)
-    })}</UI.Table>)
+    })}</UI.TBody></UI.Table>)
 
     return (
       <UI.Container>
