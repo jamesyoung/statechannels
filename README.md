@@ -259,3 +259,37 @@ hub receives al's request with signed message from james
 hub closes channel with al
 
 hub sends al 0.004 ETH
+
+## Demo 5
+
+### Instructions
+
+In terminal 1, start testrpc
+
+```bash
+make start/testrpc
+```
+
+In terminal 2, deploy contracts
+
+```bash
+make deploy/contracts
+```
+
+In terminal 2, start hub
+
+```bash
+make start/hub
+```
+
+In terminal 3, start alice server
+
+```bash
+make start/server/demo5
+```
+
+In terminal 3, start hub frontend
+
+```bash
+make start/frontend/demo5
+```

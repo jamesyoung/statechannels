@@ -7,7 +7,6 @@ import {
   getConnectedAccount,
   isMetamaskConnected,
   getConnectedNetwork,
-  getContractAddress
 } from './utils';
 
 const UI = {

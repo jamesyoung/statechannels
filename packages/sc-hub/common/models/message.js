@@ -17,79 +17,77 @@ const {
 const contract = require('../../lib/contract')
 
 module.exports = function(Message) {
-  Message.message = (payload, cb) => {
-    ;(async () => {
-      try {
-        const web3 = getWeb3(Message)
-        const hub = await getAccount(web3, 0)
+  Message.message = async (payload) => {
+    try {
+      const web3 = getWeb3(Message)
+      const hub = await getAccount(web3, 0)
 
-        const payer = payload.payer.toLowerCase()
-        const payee = payload.from.toLowerCase()
+      const payer = payload.payer.toLowerCase()
+      const payee = payload.from.toLowerCase()
 
-        const fromUser = await getUser(Message, {publicAddress: payee})
+      const fromUser = await getUser(Message, {publicAddress: payee})
 
-        assert.ok(fromUser, `user with public address ${payee} is not registered`)
+      assert.ok(fromUser, `user with public address ${payee} is not registered`)
 
-        const payerUser = await getUser(Message, {publicAddress: payer})
+      const payerUser = await getUser(Message, {publicAddress: payer})
 
-        assert.ok(payerUser, `user with public address ${payer} is not registered`)
+      assert.ok(payerUser, `user with public address ${payer} is not registered`)
 
-        let totalStaked = toBig((await contract.getBalance(hub, payee, web3)).toString(10))
+      let totalStaked = toBig((await contract.getBalance(hub, payee, web3)).toString(10))
 
-        assert.ok(totalStaked.toString() != '0', `user ${payer} doesn't have a channel open`)
+      assert.ok(totalStaked.toString() != '0', `user ${payer} doesn't have a channel open`)
 
-        const last = await getLastMessage(Message, {
-          from: payer,
-          to: payee,
-        })
+      const last = await getLastMessage(Message, {
+        from: payer,
+        to: payee,
+      })
 
-        let total = last ? toBig(last.value) : toBig(0)
+      let total = last ? toBig(last.value) : toBig(0)
 
-        let used = await getUsedAmount(Message, {
-          from: payer
-        })
+      let used = await getUsedAmount(Message, {
+        from: payer
+      })
 
+      // TODO: not hardcode amount
+      const pay = toBig(fromEth(0.1).toString(10))
 
-        const pay = toBig(fromEth(0.1).toString(10))
-
-        // clamp total so it doesn't go over the locked eth amount
-        if (used.add(pay).cmp(totalStaked) <= 0) {
-          total = total.add(pay)
-        }
-
-        const url = 'http://localhost:9999/webhook'
-
-        const appResp = await request.post(url, {
-          body: {
-            action: 'sign',
-            data: {
-              value: total.toString(),
-              payee,
-              contractAddress: contract.address,
-            }
-          },
-          json: true
-        })
-
-        const { state } = appResp
-
-        // store in db
-        await createMessage(Message, {
-          from: payer,
-          to: payee,
-          value: total.toString(),
-          createdAt: moment().toDate(),
-          state
-        })
-
-        cb(null, {
-          state
-        })
-
-      } catch(err) {
-        cb(err.message, null)
+      // clamp total so it doesn't go over the locked eth amount
+      if (used.add(pay).cmp(totalStaked) <= 0) {
+        total = total.add(pay)
       }
-    })();
+
+      const url = 'http://localhost:9999/webhook'
+
+      const appResp = await request.post(url, {
+        body: {
+          action: 'sign',
+          data: {
+            value: total.toString(),
+            payee,
+            contractAddress: contract.address,
+          }
+        },
+        json: true
+      })
+
+      const { state } = appResp
+
+      // store in db
+      await createMessage(Message, {
+        from: payer,
+        to: payee,
+        value: total.toString(),
+        createdAt: moment().toDate(),
+        state
+      })
+
+      return {
+        state
+      }
+
+    } catch(err) {
+      throw new Error(err.message)
+    }
   }
 
   Message.remoteMethod('message', {

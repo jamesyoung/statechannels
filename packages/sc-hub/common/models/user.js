@@ -36,42 +36,28 @@ module.exports = function(User) {
   User.validatesUniquenessOf('email')
   User.validatesUniquenessOf('publicAddress')
 
-  User.observe('after save', function(ctx, next) {
-    ;(async () => {
-      const web3 = getWeb3(User)
-      if (!ctx.isNewInstance) {
-        return next()
-      }
+  User.observe('after save', async (ctx, next) => {
+    const web3 = getWeb3(User)
+    if (!ctx.isNewInstance) {
+      return next()
+    }
 
-      const alice = await getAccount(web3, 1)
+    const alice = await getAccount(web3, 1)
 
-      if (alice.toLowerCase() === ctx.instance.publicAddress.toLowerCase()) {
-        return next()
-      }
+    if (alice.toLowerCase() === ctx.instance.publicAddress.toLowerCase()) {
+      return next()
+    }
 
-      /*
-      // alice channel with hub
-      const channel = getChannel(User, {
-        account: alice
-      })
+    const payee = ctx.instance.publicAddress
+    const hub = await getAccount(web3, 0)
+    // TODO: read alice value locked-up
+    const value = fromEth(1).toString()
+    const timeout = moment().add(1, 'day').unix()
+    // collaterize channel
+    const result = await contract.open(payee, value, timeout, hub, web3)
 
-      if (channel && (channel.account == alice)) {
-        next()
-      }
-      assert.ok(channel, `Alice doesn't have channel open with hub`)
-      */
+    console.log('user joined hub', result.transactionHash)
 
-      const payee = ctx.instance.publicAddress
-      const hub = await getAccount(web3, 0)
-      // TODO: read alice value locked-up
-      const value = fromEth(1).toString()
-      const timeout = moment().add(1, 'day').unix()
-      // collaterize channel
-      const result = await contract.open(payee, value, timeout, hub, web3)
-
-      console.log('user joined hub', result.transactionHash)
-
-      next()
-    })();
+    next()
   })
 }

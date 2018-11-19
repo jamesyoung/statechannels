@@ -33,8 +33,5 @@
     "prettier": "^1.14.3"
   },
   "dependencies": {
-    "ethereumjs-util": "^6.0.0",
-    "request-promise": "^4.2.2",
-    "web3-utils": "^1.0.0-beta.36"
   }
 }

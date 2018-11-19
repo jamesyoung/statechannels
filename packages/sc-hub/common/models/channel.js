@@ -33,8 +33,7 @@ function getUser(Channel, where) {
 }
 
 module.exports = function(Channel) {
-  Channel.openChannel = (payload, cb) => {
-    ;(async () => {
+  Channel.openChannel = async (payload) => {
       try {
         const web3 = getWeb3(Channel)
 
@@ -52,33 +51,34 @@ module.exports = function(Channel) {
         assert.ok(user, `user with address ${account} does not exist`)
 
         // TODO: add listener for when tx is complete
-        setTimeout(async () => {
-          try {
-            const staked = toEth(value)
+        return new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            try {
+              const staked = toEth(value)
 
-            // store in db
-            await createChannel(Channel, {
-              contractAddress: tx.to.toLowerCase(),
-              account,
-              amount: value,
-              createdAt: moment().toDate(),
-              staked,
-              closed: false,
-            })
+              // store in db
+              await createChannel(Channel, {
+                contractAddress: tx.to.toLowerCase(),
+                account,
+                amount: value,
+                createdAt: moment().toDate(),
+                staked,
+                closed: false,
+              })
 
-            cb(null, {
-              txHash: txHash,
-              staked,
-              closed: false
-            })
-          } catch(err) {
-            cb(err.message, null)
-          }
-        }, 1e3)
+              resolve({
+                txHash: txHash,
+                staked,
+                closed: false
+              })
+            } catch(err) {
+              reject(new Error(err.message))
+            }
+          }, 1e3)
+        })
       } catch(err) {
-        cb(err.message, null)
+        throw new Error(err.message)
       }
-    })();
   }
 
   Channel.remoteMethod('openChannel', {
@@ -106,28 +106,26 @@ module.exports = function(Channel) {
   });
 
   // close state channel
-  Channel.closeChannel = (payload, cb) => {
-    ;(async () => {
-        const web3 = getWeb3(Channel)
-        const { r, s, v, sig, hash, to:receiver, from:payer, value:total } = payload.state
-        const signer = await getAccount(web3, 0)
-        const msg = prefixMsg(hash)
+  Channel.closeChannel = async (payload) => {
+    try {
+      const web3 = getWeb3(Channel)
+      const { r, s, v, sig, hash, to:receiver, from:payer, value:total } = payload.state
+      const signer = await getAccount(web3, 0)
+      const msg = prefixMsg(hash)
 
-        // TODO: hub close channel with alice (via webhook endpoint)
+      // TODO: hub close channel with alice (via webhook endpoint)
 
-        const result = await contract.close({msg, r, s, v, total, payer, receiver}, signer, web3)
+      const result = await contract.close({msg, r, s, v, total, payer, receiver}, signer, web3)
 
-        assert.equal(result.status, true, 'did not receive successful status')
+      assert.equal(result.status, true, 'did not receive successful status')
 
-      try {
-        cb(null, {
-          closed: true,
-          txHash: result.transactionHash
-        })
-      } catch(err) {
-        cb(err.message, null)
+      return {
+        closed: true,
+        txHash: result.transactionHash
       }
-    })();
+    } catch(err) {
+      throw new Error(err.message)
+    }
   }
 
   Channel.remoteMethod('closeChannel', {
