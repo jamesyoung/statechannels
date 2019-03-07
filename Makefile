@@ -4,8 +4,8 @@ all: build
 install:
 	@npm install
 
-.PHONY: lerna
-lerna:
+.PHONY: bootstrap
+bootstrap:
 	@lerna bootstrap
 
 .PHONY: build

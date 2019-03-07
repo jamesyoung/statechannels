@@ -23,11 +23,11 @@
     "loopback-connector-web3": "^0.1.0",
     "moment": "^2.22.2",
     "request": "^2.88.0",
+    "request-promise": "^4.2.2",
     "serve-favicon": "^2.0.1",
     "strong-error-handler": "^3.0.0",
-    "web3": "^1.0.0-beta.36",
-    "web3-utils": "^1.0.0-beta.36",
-    "request-promise": "^4.2.2"
+    "web3": "^1.0.0-beta.48",
+    "web3-utils": "^1.0.0-beta.36"
   },
   "repository": {
     "type": "",

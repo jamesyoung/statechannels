@@ -16,7 +16,7 @@ contract Channel {
         address payee;
     }
     mapping(address => Deposit) public payers;
-    
+
     constructor(address _hub, uint256 _percentageFee) public {
         hub = _hub;
         percentageFee = _percentageFee;

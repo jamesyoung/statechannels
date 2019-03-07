@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 import "./SafeMath.sol";
 
+// NOTE: this is proof-of-concept qualiity
+
 contract Demo5 {
     using SafeMath for uint256;
 
