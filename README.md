@@ -17,7 +17,7 @@ It contains the following packages:
 ## Check out the project and install dependencies
 
 ```sh
-git clone git@github.com:LunchBadger/statechannels.git
+git clone git@github.com:jamesyoung/statechannels.git
 cd statechannels
 git submodule init
 git submodule update
